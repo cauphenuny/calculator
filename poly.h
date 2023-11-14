@@ -1,11 +1,14 @@
 #ifndef POLY_H
 #define POLY_H
 
-class monomial : math_item {
+#include "item.h"
+#include "num.h"
+
+class monomial : public math_item {
     rational_num co; // coefficient
-    char id, end_char = ' ';
-    s64 deg;
 public:
+    char id;
+    s64 deg;
     monomial operator+ (const monomial& m) {
         monomial res;
         res.co = co + m.co;
@@ -36,18 +39,21 @@ public:
         }
         printf(" ");
     }
+    bool neg() const {
+        return co.neg();
+    }
+    bool pos() const {
+        return co.neg();
+    }
     std::string latex() const {
-        string res = "{" + co.latex() + "}";
+        std::string res = co.latex();
         if (id) {
-            res += c;
+            res += id;
             if (deg != 1) {
                 res += "^{" + std::to_string(deg) + "}";
             }
         }
-        return res;
-    }
-    char end() const {
-        return end_char;
+        return "{" + res + "}";
     }
 };
 
@@ -59,7 +65,7 @@ bool operator> (const monomial& m1, const monomial& m2) {
     return m2 < m1;
 }
 
-class polynomial : math_item {
+class polynomial : public math_item {
 private:
     std::vector<monomial> mono;
 public:
@@ -93,6 +99,16 @@ public:
         if (p2 < poly.mono.size()) {
             for (size_t i = p2; i < poly.mono.size(); i++) {
                 res.mono.push_back(poly.mono[i]);
+            }
+        }
+        return res;
+    }
+    std::string latex() const {
+        if (mono.empty()) return "";
+        std::string res = mono[0].latex();
+        for (int i = 1; i < mono.size(); i++) {
+            if (!mono[i].neg()) {
+                res += "+" + mono[i].latex();
             }
         }
         return res;

@@ -25,7 +25,6 @@ class math_item {
 public:
     char input();
     std::string latex() const;
-    //int latex() const;
 };
 
 struct mathin_t {

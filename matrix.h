@@ -7,7 +7,7 @@
 #include <cstring>
 
 class matrix : public math_item {
-    std::vector<std::vector<num>> _vec;
+    std::vector<vect> _vec;
     int _row, _col;
 public:
     void input() {

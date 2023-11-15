@@ -14,6 +14,9 @@ private:
     s64 down{1}; // denominator
 
 public:
+    num(s64 numerator = 0, s64 denominator = 1): up(numerator), down(denominator) {}
+    num(const num& n): up(n.up), down(n.down) {}
+
     void format() {
         if (!down) throw "divided by zero!";
         if (up) {
@@ -44,7 +47,7 @@ public:
         if (down == 1) { 
             res = "{" + std::to_string(up) + "}"; 
         } else {
-            res = "\\dfrac{" + std::to_string(up) + "}{" + std::to_string(down) + "}";
+            res = "\\frac{" + std::to_string(up) + "}{" + std::to_string(down) + "}";
         }
         return res;
     }
@@ -77,7 +80,7 @@ public:
     void operator= (const s64& val) {
         up = val, down = 1;
     }
-    num operator+ (const num& val) {
+    num operator+ (const num& val) const {
         num res;
         s64 g = gcd(down, val.down);
         res.up = up * (val.down / g) + val.up * (down / g);
@@ -85,7 +88,7 @@ public:
         res.format();
         return res;
     }
-    num operator- (const num& val) {
+    num operator- (const num& val) const {
         num res;
         s64 g = gcd(down, val.down);
         res.up = up * (val.down / g) - val.up * (down / g);
@@ -93,12 +96,12 @@ public:
         res.format();
         return res;
     }
-    num operator* (const num& val) {
+    num operator* (const num& val) const {
         num res(up * val.up, down * val.down);
         res.format();
         return res;
     }
-    num operator/ (const num& val) {
+    num operator/ (const num& val) const {
         num res(up * val.down, down * val.up);
         res.format();
         return res;
@@ -144,7 +147,6 @@ public:
         return (up * val.down) >= (val.up * down);
     }
 
-    num(s64 numerator = 0, s64 denominator = 1): up(numerator), down(denominator) {}
 };
 
 #endif

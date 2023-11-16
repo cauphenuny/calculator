@@ -1,5 +1,5 @@
-#ifndef RAT_H
-#define RAT_H
+#ifndef NUM_H
+#define NUM_H
 
 #include <string>
 #include <iostream>
@@ -161,7 +161,7 @@ std::ostream& operator<< (std::ostream &os, const Num& n) {
     if (down == 1) { 
         os << "{" << up << "}"; 
     } else {
-        os << "\\frac{" << up << "}{" << down + "}";
+        os << "\\frac{" << up << "}{" << down << "}";
     }
     return os;
 }

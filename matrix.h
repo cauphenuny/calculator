@@ -1,37 +1,34 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
-#include "num.h"
 #include "vector.h"
 #include "basic.h"
 #include <vector>
 #include <string>
 #include <cassert>
+#include "debug.h"
 
 template<typename T>
 class Matrix : public Vector<Vector<T>> {
 protected:
-    size_t _n, _m;
+    size_t _m;
 
 public:
     Matrix(size_t row, size_t col) :
         Vector<Vector<T>>(row, Vector<T>(col)), 
-        _n(row),
         _m(col) {
+        logl("constructor #1");
     }
     Matrix(size_t row, size_t col, T t) :
         Vector<Vector<T>>(row, Vector<T>(col, t)),
-        _n(row),
         _m(col) {
     }
     Matrix(const Vector<Vector<T>>& v) : 
         Vector<Vector<T>>(v),
-        _n(v._n),
         _m(v[1].size()) {
     }
     Matrix(Matrix&& mat) :
         Vector<Vector<T>>(mat),
-        _n(mat._n),
         _m(mat._m) {
     }
 
@@ -47,8 +44,14 @@ public:
     Matrix inverse() const;
     friend void gauss();
 
-    size_t rsize() const { return _n; }
-    size_t csize() const { return _m; }
+    size_t rsize() const { return this -> _n; }
+    size_t csize() const { return this -> _m; }
+
+    friend void swap(Matrix<T>& mat1, Matrix<T>& mat2) {
+        std::swap(mat1._n, mat2._n);
+        std::swap(mat1._m, mat2._m);
+        std::swap(mat1._data, mat2._data);
+    }
 
     friend Matrix<T> operator+ (const Matrix<T>& mat1, const Matrix<T>& mat2) {
         assert(mat1._n == mat2._n), assert(mat1._m == mat2._m);
@@ -95,8 +98,5 @@ public:
     }
 };
 
-
-using qMatrix = Matrix<Num>;
-using rMatrix = Matrix<double>;
 
 #endif

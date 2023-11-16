@@ -5,6 +5,8 @@
 #include <string>
 #include <cassert>
 #include "basic.h"
+#include <cstdio>
+#include "debug.h"
 
 template<typename T>
 class Vector {
@@ -16,13 +18,15 @@ public:
     Vector(size_t n) {
         _n = n;
         _data = new T[n];
+        logl("#1 done");
     }
     Vector(size_t n, const T& t) {
         _n = n;
-        _data = new T[n];
-        for (size_t i = 0; i < n; i++) {
+        _data = new T[_n];
+        for (size_t i = 0; i < _n; i++) {
             _data[i] = t;
         }
+        logl("#2 done");
     }
     Vector(const Vector<T>& v) {
         _n = v._n;
@@ -30,14 +34,18 @@ public:
         for (size_t i = 0; i < _n; i++) {
             _data[i] = v._data[i];
         }
+        logl("#3 done");
     }
     Vector(Vector<T>&& v) {
         _n = v._n;
         _data = v._data;
         v._data = nullptr;
+        logl("#4 done");
     }
     ~Vector() {
+        logl("detructor");
         if (_data != nullptr) {
+            logl("free memory");
             delete[] _data;
         }
     }
@@ -60,6 +68,11 @@ public:
             is >> vec[i];
         }
         return is;
+    }
+
+    friend void swap(Vector<T>& v1, Vector<T>& v2) {
+        std::swap(v1._data, v2._data);
+        std::swap(v1._n, v2._n);
     }
 };
 
@@ -95,11 +108,6 @@ class rowVector : public Vector<T> {
     }
 };
 
-using qrowVector = rowVector<Num>; // row vector in Q^n
-using rrowVector = rowVector<double>; // row vector in R^n
-using qcolVector = colVector<Num>; // column vector in Q^n
-using rcolVector = colVector<double>; // column vector in R^n
-
 template<typename T>
 Vector<T> operator+ (const Vector<T>& v1, const Vector<T>& v2) {
     assert(v1.size() == v2.size());
@@ -123,7 +131,7 @@ Vector<T> operator- (const Vector<T>& v1, const Vector<T>& v2) {
 }
 
 template<typename T>
-Vector<T> operator* (const Vector<T>& v, const Num& c) {
+Vector<T> operator* (const Vector<T>& v, const T& c) {
     size_t n = v.size();
     Vector<T> res(n);
     for (size_t i = 1; i <= n; i++) {
@@ -133,7 +141,7 @@ Vector<T> operator* (const Vector<T>& v, const Num& c) {
 }
 
 template<typename T>
-Vector<T> operator* (const Num& c, const Vector<T>& v) {
+Vector<T> operator* (const T& c, const Vector<T>& v) {
     size_t n = v.size();
     Vector<T> res(n);
     for (size_t i = 1; i <= n; i++) {
@@ -143,7 +151,7 @@ Vector<T> operator* (const Num& c, const Vector<T>& v) {
 }
 
 template<typename T>
-Vector<T> operator/ (const Vector<T>& v, const Num& c) {
+Vector<T> operator/ (const Vector<T>& v, const T& c) {
     size_t n = v.size();
     Vector<T> res(n);
     for (size_t i = 1; i <= n; i++) {

@@ -18,7 +18,10 @@ public:
     }
     vect(size_t n, const T& t) {
         _n = n;
-        _data = new T[n](t);
+        _data = new T[n];
+        for (size_t i = 0; i < n; i++) {
+            _data[i] = t;
+        }
     }
     vect(const vect<T>& v) {
         _n = v._n;
@@ -81,7 +84,7 @@ class col_vector : public vect<T> {
 
 template<typename T>
 class row_vector : public vect<T> {
-    friend const std::string& latex(const row_vector<T>& vec) {
+    friend const std::string latex(const row_vector<T>& vec) {
         std::string res = "\\left(\\begin{array}{c}";
         auto n = vec.size();
         if (n) {

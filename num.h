@@ -47,6 +47,7 @@ public:
         while (!isdigit(*c) && c != str.end()) {
             sig = (*c == '-'), c++;
         }
+        up = 0, down = 1;
         while (isdigit(*c) && c != str.end()) {
             up = up * 10 + *c - '0', c++;
         }

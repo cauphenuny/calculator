@@ -13,6 +13,7 @@ class Vector {
 protected:
     T* _data;
     size_t _n;
+
 public:
     Vector() : _data(nullptr) {}
     Vector(size_t n) {
@@ -53,9 +54,11 @@ public:
     T& operator[] (size_t c) { return _data[c - 1]; }
     const T& operator[] (size_t c) const { return _data[c - 1]; }
     Vector<T>& operator= (const Vector<T>& v) {
-        if (_data != nullptr) delete[] _data;
+        if (v._n > _n) {
+            if (_data != nullptr) delete[] _data;
+            _data = new T[_n];
+        }
         _n = v._n;
-        _data = new T[_n];
         for (size_t i = 0; i < _n; i++) {
             _data[i] = v._data[i];
         }

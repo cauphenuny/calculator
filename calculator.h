@@ -1,6 +1,6 @@
 #ifndef CALC_H
 #define CALC_H
 #include "num.h"
-#include "vect.h"
+#include "vector.h"
 #include "matrix.h"
 #endif

@@ -9,7 +9,7 @@
 #include "debug.h"
 
 template<typename T>
-class Matrix : public Vector<Vector<T>> {
+class Matrix : public Vector<rowVector<T>> {
 protected:
     size_t _m;
 

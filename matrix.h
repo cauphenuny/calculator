@@ -3,6 +3,7 @@
 
 #include "num.h"
 #include "vect.h"
+#include "basic.h"
 #include <vector>
 #include <string>
 #include <cassert>
@@ -63,25 +64,22 @@ public:
         return res;
     }
 
-    friend const std::string latex(const matrix<T>& mat) {
-        std::string res = "\\begin{pmatrix}\n";
+    friend std::ostream& operator<< (std::ostream& os, const matrix<T>& mat) {
+        os << "\\begin{pmatrix}\n";
         auto n = mat.rsize(), m = mat.csize();
         for (size_t i = 1; i <= n; i++) {
             for (size_t j = 1; j < m; j++) {
-                res += latex(mat(i, j)) + "&";
+                os << mat(i, j) << "&";
             }
-            res += latex(mat(i, m)) + "\\\\\n";
+            os << mat(i, m) << "\\\\\n";
         }
-        res += "\\end{pmatrix}\n";
-        return res;
-    }
-    friend std::ostream& operator<< (std::ostream& os, const matrix<T>& mat) {
-        os << latex(mat);
+        os << "\\end{pmatrix}\n";
         return os;
     }
 };
 
 
 using q_matrix = matrix<num>;
+using r_matrix = matrix<double>;
 
 #endif

@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iostream>
+#include "basic.h"
 
 int64_t gcd(int64_t a, int64_t b) {
     return b == 0 ? a : gcd(b, a % b);
@@ -15,7 +16,6 @@ private:
 
 public:
     friend void input(num&);
-    friend const std::string latex(const num&);
     friend std::istream& operator>> (std::istream &, num&);
     friend std::ostream& operator<< (std::ostream &, const num&);
 
@@ -149,18 +149,6 @@ public:
 
 };
 
-const std::string latex(const num& n) {
-    std::string res;
-    auto &up = n.up, &down = n.down;
-    if (up == 0) return "{0}";
-    if (down == 1) { 
-        res = "{" + std::to_string(up) + "}"; 
-    } else {
-        res = "\\frac{" + std::to_string(up) + "}{" + std::to_string(down) + "}";
-    }
-    return res;
-}
-
 std::istream& operator>> (std::istream &is, num& n) {
     std::string str;
     is >> str;
@@ -169,7 +157,12 @@ std::istream& operator>> (std::istream &is, num& n) {
 }
 
 std::ostream& operator<< (std::ostream &os, const num& n) {
-    os << latex(n);
+    auto &up = n.up, &down = n.down;
+    if (down == 1) { 
+        os << "{" << up << "}"; 
+    } else {
+        os << "\\frac{" << up << "}{" << down + "}";
+    }
     return os;
 }
 

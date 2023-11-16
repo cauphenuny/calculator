@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <cassert>
+#include "basic.h"
 
 template<typename T>
 class vect {
@@ -64,40 +65,34 @@ public:
 
 template<typename T>
 class col_vector : public vect<T> {
-    friend const std::string latex(const col_vector<T>& vec) {
-        std::string res = "\\left(\\begin{array}{c}";
+    friend std::ostream& operator<< (std::ostream &os, const col_vector<T>& vec) {
+        os << "\\left(\\begin{array}{c}";
         auto n = vec.size();
         if (n) {
             for (size_t i = 1; i < n; i++) {
-                res += latex(vec[i]) + "\\\\";
+                os << vec[i] << "\\\\";
             }
-            res += latex(vec[n]);
+            os << vec[n];
         }
-        res += "\\end{array}\\right)";
-        return res;
-    }
-    friend std::ostream& operator<< (std::ostream &os, const col_vector<T>& cv) {
-        os << latex(cv);
+        os << "\\end{array}\\right)";
         return os;
     }
 };
 
 template<typename T>
 class row_vector : public vect<T> {
-    friend const std::string latex(const row_vector<T>& vec) {
-        std::string res = "\\left(\\begin{array}{c}";
+    //friend const std::string latex(const row_vector<T>& vec) {
+    //}
+    friend std::ostream& operator<< (std::ostream &os, const row_vector<T>& vec) {
+        os << "\\left(\\begin{array}{c}";
         auto n = vec.size();
         if (n) {
             for (size_t i = 1; i < n; i++) {
-                res += latex(vec[i]) + "&";
+                os << vec[i] << "&";
             }
-            res += latex(vec[n]);
+            os << vec[n];
         }
-        res += "\\end{array}\\right)";
-        return res;
-    }
-    friend std::ostream& operator<< (std::ostream &os, const row_vector<T>& rv) {
-        os << latex(rv);
+        os << "\\end{array}\\right)";
         return os;
     }
 };

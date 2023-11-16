@@ -4,51 +4,110 @@
 #include <vector>
 #include <string>
 #include <cassert>
-#include "item.h"
 
 template<typename T>
-class vect : public math_item {
+class vect {
 protected:
-    std::vector<T> _v;
-    int _n;
+    T* _data;
+    size_t _n;
 public:
-    vect(int n) : _n(n), _v(n) {}
-    vect(int n, const T& t) : _n(n), _v(n, t) {}
-    vect(const vect& v) : _n(v._n), _v(v._v) {}
-
-    void input() { 
-        for (int i = 0; i < _n; i++) {
-            _v[i].input();
+    vect() : _data(nullptr) {}
+    vect(size_t n) {
+        _n = n;
+        _data = new T[n];
+    }
+    vect(size_t n, const T& t) {
+        _n = n;
+        _data = new T[n](t);
+    }
+    vect(const vect<T>& v) {
+        _n = v._n;
+        _data = new T[_n];
+        for (size_t i = 0; i < _n; i++) {
+            _data[i] = v._data[i];
+        }
+    }
+    vect(vect<T>&& v) {
+        _n = v._n;
+        _data = v._data;
+        v._data = nullptr;
+    }
+    ~vect() {
+        if (_data != nullptr) {
+            delete[] _data;
         }
     }
 
-    T& operator[] (int c) { return _v[c - 1]; }
-    const T& operator[] (int c) const { return _v[c - 1]; }
+    T& operator[] (size_t c) { return _data[c - 1]; }
+    const T& operator[] (size_t c) const { return _data[c - 1]; }
+    vect<T>& operator= (const vect<T>& v) {
+        if (_data != nullptr) delete[] _data;
+        _n = v._n;
+        _data = new T[_n];
+        for (size_t i = 0; i < _n; i++) {
+            _data[i] = v._data[i];
+        }
+        return *this;
+    }
 
-    int size() const { return _n; }
-    std::string latex() const;
+    size_t size() const { return _n; }
+    friend std::istream& operator>> (std::istream& is, vect<T>& vec) {
+        for (size_t i = 1; i <= vec.size(); i++) {
+            is >> vec[i];
+        }
+        return is;
+    }
 };
 
+template<typename T>
+class col_vector : public vect<T> {
+    friend const std::string latex(const col_vector<T>& vec) {
+        std::string res = "\\left(\\begin{array}{c}";
+        auto n = vec.size();
+        if (n) {
+            for (size_t i = 1; i < n; i++) {
+                res += latex(vec[i]) + "\\\\";
+            }
+            res += latex(vec[n]);
+        }
+        res += "\\end{array}\\right)";
+        return res;
+    }
+    friend std::ostream& operator<< (std::ostream &os, const col_vector<T>& cv) {
+        os << latex(cv);
+        return os;
+    }
+};
 
 template<typename T>
-std::string vect<T>::latex() const {
-    std::string res = "\\left(\\begin{array}{c}";
-    if (_n) {
-        for (int i = 0; i < _n - 1; i++) {
-            res += _v[i].latex() + "\\\\";
+class row_vector : public vect<T> {
+    friend const std::string& latex(const row_vector<T>& vec) {
+        std::string res = "\\left(\\begin{array}{c}";
+        auto n = vec.size();
+        if (n) {
+            for (size_t i = 1; i < n; i++) {
+                res += latex(vec[i]) + "&";
+            }
+            res += latex(vec[n]);
         }
-        res += _v[_n - 1].latex();
+        res += "\\end{array}\\right)";
+        return res;
     }
-    res += "\\end{array}\\right)";
-    return res;
-}
+    friend std::ostream& operator<< (std::ostream &os, const row_vector<T>& rv) {
+        os << latex(rv);
+        return os;
+    }
+};
+
+using rq_vector = row_vector<num>; // row vector in Q^n
+using cq_vector = col_vector<num>; // column vector in Q^n
 
 template<typename T>
 vect<T> operator+ (const vect<T>& v1, const vect<T>& v2) {
     assert(v1.size() == v2.size());
-    int n = v1.size();
+    size_t n = v1.size();
     vect<T> res(n);
-    for (int i = 1; i <= n; i++) {
+    for (size_t i = 1; i <= n; i++) {
         res[i] = v1[i] + v2[i];
     }
     return res;
@@ -57,9 +116,9 @@ vect<T> operator+ (const vect<T>& v1, const vect<T>& v2) {
 template<typename T>
 vect<T> operator- (const vect<T>& v1, const vect<T>& v2) {
     assert(v1.size() == v2.size());
-    int n = v1.size();
+    size_t n = v1.size();
     vect<T> res(n);
-    for (int i = 1; i <= n; i++) {
+    for (size_t i = 1; i <= n; i++) {
         res[i] = v1[i] - v2[i];
     }
     return res;
@@ -67,9 +126,9 @@ vect<T> operator- (const vect<T>& v1, const vect<T>& v2) {
 
 template<typename T>
 vect<T> operator* (const vect<T>& v, const num& c) {
-    int n = v.size();
+    size_t n = v.size();
     vect<T> res(n);
-    for (int i = 1; i <= n; i++) {
+    for (size_t i = 1; i <= n; i++) {
         res[i] = v[i] * c;
     }
     return res;
@@ -77,9 +136,9 @@ vect<T> operator* (const vect<T>& v, const num& c) {
 
 template<typename T>
 vect<T> operator* (const num& c, const vect<T>& v) {
-    int n = v.size();
+    size_t n = v.size();
     vect<T> res(n);
-    for (int i = 1; i <= n; i++) {
+    for (size_t i = 1; i <= n; i++) {
         res[i] = v[i] * c;
     }
     return res;
@@ -87,14 +146,12 @@ vect<T> operator* (const num& c, const vect<T>& v) {
 
 template<typename T>
 vect<T> operator/ (const vect<T>& v, const num& c) {
-    int n = v.size();
+    size_t n = v.size();
     vect<T> res(n);
-    for (int i = 1; i <= n; i++) {
+    for (size_t i = 1; i <= n; i++) {
         res[i] = v[i] / c;
     }
     return res;
 }
-
-using qn_vector = vect<num>; // vector in Qn
 
 #endif

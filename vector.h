@@ -1,12 +1,12 @@
 #ifndef VECT_H
 #define VECT_H
 
+#include "basic.h"
+#include "debug.h"
+#include <cstdio>
 #include <vector>
 #include <string>
 #include <cassert>
-#include "basic.h"
-#include <cstdio>
-#include "debug.h"
 
 template<typename T>
 class Vector {
@@ -15,38 +15,37 @@ protected:
     size_t _n;
 
 public:
-    Vector() : _data(nullptr) {}
+    Vector(): _data(nullptr) {}
     Vector(size_t n) {
         _n = n;
         _data = new T[n];
-        logl("#1 done");
+        //debugi << "#1 done n = " << n << "\n";
     }
-    Vector(size_t n, const T& t) {
+    Vector(size_t n, const T t) {
         _n = n;
         _data = new T[_n];
         for (size_t i = 0; i < _n; i++) {
-            _data[i] = t;
+            _data[i] = T(t);
         }
-        logl("#2 done");
+        //debugi << "#2 done n = " << n << "\n";
     }
     Vector(const Vector<T>& v) {
         _n = v._n;
         _data = new T[_n];
         for (size_t i = 0; i < _n; i++) {
-            _data[i] = v._data[i];
+            _data[i] = T(v._data[i]);
         }
-        logl("#3 done");
+        //debugi << "#3 done (deep copy)\n";
     }
     Vector(Vector<T>&& v) {
         _n = v._n;
         _data = v._data;
         v._data = nullptr;
-        logl("#4 done");
+        //debugi << "#4 done (copy)\n";
     }
     ~Vector() {
-        logl("detructor");
         if (_data != nullptr) {
-            logl("free memory");
+            //debugi << "free memory\n";
             delete[] _data;
         }
     }
@@ -54,13 +53,26 @@ public:
     T& operator[] (size_t c) { return _data[c - 1]; }
     const T& operator[] (size_t c) const { return _data[c - 1]; }
     Vector<T>& operator= (const Vector<T>& v) {
-        if (v._n > _n) {
-            if (_data != nullptr) delete[] _data;
-            _data = new T[_n];
+        //debugi << "deep copy\n";
+        if (this != &v) {
+            if (v._n > _n) {
+                if (_data != nullptr) delete[] _data;
+                _data = new T[_n];
+            }
+            _n = v._n;
+            for (size_t i = 1; i <= _n; i++) {
+                this->operator[](i) = T(v[i]);
+            }
         }
-        _n = v._n;
-        for (size_t i = 0; i < _n; i++) {
-            _data[i] = v._data[i];
+        return *this;
+    }
+    Vector<T>& operator= (Vector<T>&& v) {
+        //debugi << "copy\n";
+        if (this != &v) {
+            if (_data != nullptr) delete[] _data;
+            _data = v._data;
+            _n = v._n;
+            v._data = nullptr;
         }
         return *this;
     }
@@ -77,10 +89,90 @@ public:
         std::swap(v1._data, v2._data);
         std::swap(v1._n, v2._n);
     }
+    void swap(Vector<T>& v2) {
+        std::swap(this->_data, v2._data);
+        std::swap(this->_n, v2._n);
+    }
+
+    friend Vector<T> operator+ (const Vector<T>& v1, const Vector<T>& v2) {
+        assert(v1.size() == v2.size());
+        size_t n = v1.size();
+        Vector<T> res(n);
+        for (size_t i = 1; i <= n; i++) {
+            res[i] = v1[i] + v2[i];
+        }
+        return res;
+    }
+    Vector<T>& operator+= (const Vector<T>& v2) {
+        assert(_n == v2._n);
+        for (size_t i = 1; i <= _n; i++) {
+            this->operator[](i) += v2[i];
+        }
+        return *this;
+    }
+
+    friend Vector<T> operator- (const Vector<T>& v1, const Vector<T>& v2) {
+        assert(v1.size() == v2.size());
+        size_t n = v1.size();
+        Vector<T> res(n);
+        for (size_t i = 1; i <= n; i++) {
+            res[i] = v1[i] - v2[i];
+        }
+        return res;
+    }
+    Vector<T>& operator-= (const Vector<T>& v2) {
+        assert(_n == v2._n);
+        for (size_t i = 1; i <= _n; i++) {
+            this->operator[](i) -= v2[i];
+        }
+        return *this;
+    }
+
+    friend Vector<T> operator* (const Vector<T>& v, const T& c) {
+        size_t n = v.size();
+        Vector<T> res(n);
+        for (size_t i = 1; i <= n; i++) {
+            res[i] = v[i] * c;
+        }
+        return res;
+    }
+    Vector<T>& operator*= (const T& c) {
+        for (size_t i = 1; i <= _n; i++) {
+            this->operator[](i) *= c;
+        }
+        return *this;
+    }
+    friend Vector<T> operator* (const T& c, const Vector<T>& v) {
+        size_t n = v.size();
+        Vector<T> res(n);
+        for (size_t i = 1; i <= n; i++) {
+            res[i] = v[i] * c;
+        }
+        return res;
+    }
+
+    friend Vector<T> operator/ (const Vector<T>& v, const T& c) {
+        size_t n = v.size();
+        Vector<T> res(n);
+        for (size_t i = 1; i <= n; i++) {
+            res[i] = v[i] / c;
+        }
+        return res;
+    }
+    Vector<T>& operator/= (const T& c) {
+        //debugil(_n);
+        for (size_t i = 1; i <= _n; i++) {
+            //debugil(c);
+            this->operator[](i) /= c;
+            //debug << i << " " << this->operator[](i) << std::endl;
+        }
+        return *this;
+    }
 };
 
 template<typename T>
 class colVector : public Vector<T> {
+    using Vector<T>::Vector;
     friend std::ostream& operator<< (std::ostream &os, const colVector<T>& vec) {
         os << "\\left(\\begin{array}{c}";
         auto n = vec.size();
@@ -97,6 +189,7 @@ class colVector : public Vector<T> {
 
 template<typename T>
 class rowVector : public Vector<T> {
+    using Vector<T>::Vector;
     friend std::ostream& operator<< (std::ostream &os, const rowVector<T>& vec) {
         os << "\\left(\\begin{array}{c}";
         auto n = vec.size();
@@ -110,57 +203,5 @@ class rowVector : public Vector<T> {
         return os;
     }
 };
-
-template<typename T>
-Vector<T> operator+ (const Vector<T>& v1, const Vector<T>& v2) {
-    assert(v1.size() == v2.size());
-    size_t n = v1.size();
-    Vector<T> res(n);
-    for (size_t i = 1; i <= n; i++) {
-        res[i] = v1[i] + v2[i];
-    }
-    return res;
-}
-
-template<typename T>
-Vector<T> operator- (const Vector<T>& v1, const Vector<T>& v2) {
-    assert(v1.size() == v2.size());
-    size_t n = v1.size();
-    Vector<T> res(n);
-    for (size_t i = 1; i <= n; i++) {
-        res[i] = v1[i] - v2[i];
-    }
-    return res;
-}
-
-template<typename T>
-Vector<T> operator* (const Vector<T>& v, const T& c) {
-    size_t n = v.size();
-    Vector<T> res(n);
-    for (size_t i = 1; i <= n; i++) {
-        res[i] = v[i] * c;
-    }
-    return res;
-}
-
-template<typename T>
-Vector<T> operator* (const T& c, const Vector<T>& v) {
-    size_t n = v.size();
-    Vector<T> res(n);
-    for (size_t i = 1; i <= n; i++) {
-        res[i] = v[i] * c;
-    }
-    return res;
-}
-
-template<typename T>
-Vector<T> operator/ (const Vector<T>& v, const T& c) {
-    size_t n = v.size();
-    Vector<T> res(n);
-    for (size_t i = 1; i <= n; i++) {
-        res[i] = v[i] / c;
-    }
-    return res;
-}
 
 #endif

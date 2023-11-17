@@ -4,12 +4,21 @@
 #ifdef DEBUG
 
 #include <cstdio>
+#include <iostream>
 
-#define logl(fmt, ...) \
-    fprintf(stderr, "%s:%d, %s: " fmt "\n", __FILE__, __LINE__, __func__, ## __VA_ARGS__)
+#define debugw(x) std::cerr << #x << " = " << (x) << " "
+#define debugl(x) std::cerr << #x << " = " << (x) << std::endl
+#define debugi std::cerr << __FILE__ << ":" << __LINE__ << ", " << __func__ << ": "
+#define debugil(x) std::cerr << __FILE__ << ":" << __LINE__ << ", " << __func__ << ": " << #x << " = " << (x) << std::endl
+#define debug std::cerr 
+
 #else
 
-#define logl(...)
+#define debugl(...)
+#define debugw(...)
+#define debugi
+#define debugil(...)
+#define debug
 
 #endif
 

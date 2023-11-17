@@ -3,7 +3,9 @@
 
 #include <string>
 #include <iostream>
+#include <cassert>
 #include "basic.h"
+#include "debug.h"
 
 int64_t gcd(int64_t a, int64_t b) {
     return b == 0 ? a : gcd(b, a % b);
@@ -15,12 +17,11 @@ private:
     int64_t down; // denominator
 
 public:
-    friend void input(Num&);
     friend std::istream& operator>> (std::istream &, Num&);
     friend std::ostream& operator<< (std::ostream &, const Num&);
 
     void format() {
-        if (!down) throw "divided by zero!";
+        assert(down != 0);
         if (up) {
             int64_t g = gcd(up, down);
             up /= g, down /= g;
@@ -44,21 +45,21 @@ public:
     Num(const std::string& str) {
         auto c = str.begin();
         int64_t sig = 0;
-        while (!isdigit(*c) && c != str.end()) {
+        while (c != str.end() && !isdigit(*c)) {
             sig = (*c == '-'), c++;
         }
         up = 0, down = 1;
-        while (isdigit(*c) && c != str.end()) {
+        while (c != str.end() && isdigit(*c)) {
             up = up * 10 + *c - '0', c++;
         }
         up *= sig ? -1 : 1;
         if (*c == '/') {
             sig = 0;
-            while (!isdigit(*c) && c != str.end()) {
+            while (c != str.end() && !isdigit(*c)) {
                 sig = (*c == '-'), c++;
             }
             down = 0;
-            while (isdigit(*c) && c != str.end()) {
+            while (c != str.end() && isdigit(*c)) {
                 down = down * 10 + *c - '0', c++;
             }
             down *= sig ? -1 : 1;
@@ -68,6 +69,12 @@ public:
 
     void operator= (const int64_t& val) {
         up = val, down = 1;
+    }
+    Num operator- () const {
+        return Num(-up, down);
+    }
+    Num operator+ () const {
+        return Num(up, down);
     }
     Num operator+ (const Num& val) const {
         Num res;
@@ -153,6 +160,7 @@ std::istream& operator>> (std::istream &is, Num& n) {
     std::string str;
     is >> str;
     n = str;
+    //debugil(n);
     return is;
 }
 
@@ -161,7 +169,11 @@ std::ostream& operator<< (std::ostream &os, const Num& n) {
     if (down == 1) { 
         os << "{" << up << "}"; 
     } else {
-        os << "\\frac{" << up << "}{" << down << "}";
+        if (up > 0) {
+            os << "\\frac{" << up << "}{" << down << "}";
+        } else {
+            os << "{-\\frac{" << -up << "}{" << down << "}}";
+        }
     }
     return os;
 }

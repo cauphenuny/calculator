@@ -61,7 +61,7 @@ public:
             }
             _n = v._n;
             for (size_t i = 1; i <= _n; i++) {
-                this->operator[](i) = T(v[i]);
+                (*this)[i] = T(v[i]);
             }
         }
         return *this;
@@ -75,6 +75,20 @@ public:
             v._data = nullptr;
         }
         return *this;
+    }
+    bool operator== (const Vector<T>& v) const {
+        for (size_t i = 1; i <= v.size(); i++) {
+            if ((*this)[i] != v[i]) {
+                //debugl((*this)[i]);
+                //debugl(v[i]);
+                return 0;
+            }
+        }
+        return 1;
+    }
+    bool operator!= (const Vector<T>& v) const {
+        //debugi << std::endl;
+        return !(this->operator==(v));
     }
 
     size_t size() const { return _n; }
@@ -106,7 +120,7 @@ public:
     Vector<T>& operator+= (const Vector<T>& v2) {
         assert(_n == v2._n);
         for (size_t i = 1; i <= _n; i++) {
-            this->operator[](i) += v2[i];
+            (*this)[i] += v2[i];
         }
         return *this;
     }
@@ -123,7 +137,7 @@ public:
     Vector<T>& operator-= (const Vector<T>& v2) {
         assert(_n == v2._n);
         for (size_t i = 1; i <= _n; i++) {
-            this->operator[](i) -= v2[i];
+            (*this)[i] -= v2[i];
         }
         return *this;
     }
@@ -136,9 +150,10 @@ public:
         }
         return res;
     }
-    Vector<T>& operator*= (const T& c) {
+    template<typename T2>
+    Vector<T>& operator*= (const T2& c) {
         for (size_t i = 1; i <= _n; i++) {
-            this->operator[](i) *= c;
+            (*this)[i] *= c;
         }
         return *this;
     }
@@ -159,12 +174,12 @@ public:
         }
         return res;
     }
-    Vector<T>& operator/= (const T& c) {
+    template<typename T2>
+    Vector<T>& operator/= (const T2& c) {
         //debugil(_n);
         for (size_t i = 1; i <= _n; i++) {
             //debugil(c);
-            this->operator[](i) /= c;
-            //debug << i << " " << this->operator[](i) << std::endl;
+            (*this)[i] /= c;
         }
         return *this;
     }

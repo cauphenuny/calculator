@@ -4,6 +4,7 @@
 #include "vector.h"
 #include "basic.h"
 #include "debug.h"
+#include "rand.h"
 #include <vector>
 #include <string>
 #include <cassert>
@@ -30,7 +31,7 @@ public:
     Matrix(Matrix<T>&& mat):
         Vector<rowVector<T>>(mat),
         _m(mat._m) {
-        //debugi << "copy constructor called";
+        debugi << "copy constructor called";
     }
     Matrix<T>& operator= (const Matrix<T>& mat) {
         if (this != &mat) {
@@ -50,10 +51,10 @@ public:
     }
 
     const T& operator() (size_t r, size_t c) const {
-        return this->operator[](r)[c];
+        return (*this)[r][c];
     }
     T& operator() (size_t r, size_t c) {
-        return this->operator[](r)[c];
+        return (*this)[r][c];
     }
     void bind(Matrix<T>& mat) {
         _bind = &mat;
@@ -62,26 +63,26 @@ public:
         _bind = nullptr;
     }
     void swap(size_t row1, size_t row2) {
-        this->operator[](row1).swap(this->operator[](row2));
+        (*this)[row1].swap((*this)[row2]);
         if (_bind != nullptr) {
             _bind->swap(row1, row2);
         }
     }
     void add(size_t row1, size_t row2, const T val) {
-        this->operator[](row1) += this->operator[](row2) * val;
+        (*this)[row1] += (*this)[row2] * val;
         if (_bind != nullptr) {
             _bind->add(row1, row2, val);
         }
     }
     void mul(size_t row, const T val) {
-        this->operator[](row) *= val;
+        (*this)[row] *= val;
         if (_bind != nullptr) {
             _bind->mul(row, val);
         }
     }
     void div(size_t row, const T val) {
         //debugil(row);
-        this->operator[](row) /= val;
+        (*this)[row] /= val;
         if (_bind != nullptr) {
             _bind->div(row, val);
         }
@@ -180,6 +181,9 @@ public:
         std::swap(mat1._data, mat2._data);
     }
 
+    using Vector<rowVector<T>>::operator==;
+    using Vector<rowVector<T>>::operator!=;
+
     using Vector<rowVector<T>>::operator+=;
     friend Matrix<T> operator+ (const Matrix<T>& mat1, const Matrix<T>& mat2) {
         Matrix<T> res(mat1);
@@ -237,6 +241,13 @@ public:
         return mat;
     }
     static Matrix<T> rand(int row, int col) {
+        Matrix<T> mat(row, col);
+        for (int i = 1; i <= row; i++) {
+            for (int j = 1; j <= col; j++) {
+                mat[i][j] = randint(-1000, 1000);
+            }
+        }
+        return mat;
     }
 };
 

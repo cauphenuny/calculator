@@ -1,8 +1,6 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-#ifdef DEBUG
-
 #include <cstdio>
 #include <iostream>
 
@@ -11,15 +9,5 @@
 #define debugi std::cerr << __FILE__ << ":" << __LINE__ << ", " << __func__ << ": "
 #define debugil(x) std::cerr << __FILE__ << ":" << __LINE__ << ", " << __func__ << ": " << #x << " = " << (x) << std::endl
 #define debug std::cerr 
-
-#else
-
-#define debugl(...)
-#define debugw(...)
-#define debugi
-#define debugil(...)
-#define debug
-
-#endif
 
 #endif

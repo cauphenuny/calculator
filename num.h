@@ -170,9 +170,9 @@ std::ostream& operator<< (std::ostream &os, const Num& n) {
         os << "{" << up << "}"; 
     } else {
         if (up > 0) {
-            os << "\\frac{" << up << "}{" << down << "}";
+            os << "\\dfrac{" << up << "}{" << down << "}";
         } else {
-            os << "{-\\frac{" << -up << "}{" << down << "}}";
+            os << "{-\\dfrac{" << -up << "}{" << down << "}}";
         }
     }
     return os;

@@ -2,7 +2,6 @@
 #define MATRIX_H
 
 #include "vector.h"
-#include "basic.h"
 #include "debug.h"
 #include "rand.h"
 #include <vector>
@@ -181,8 +180,8 @@ public:
         std::swap(mat1._data, mat2._data);
     }
 
-    using Vector<rowVector<T>>::operator==;
-    using Vector<rowVector<T>>::operator!=;
+    //using Vector<rowVector<T>>::operator==;
+    //using Vector<rowVector<T>>::operator!=;
 
     using Vector<rowVector<T>>::operator+=;
     friend Matrix<T> operator+ (const Matrix<T>& mat1, const Matrix<T>& mat2) {

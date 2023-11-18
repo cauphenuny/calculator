@@ -1,7 +1,6 @@
 #ifndef VECT_H
 #define VECT_H
 
-#include "basic.h"
 #include "debug.h"
 #include <cstdio>
 #include <vector>

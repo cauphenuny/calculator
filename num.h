@@ -4,7 +4,6 @@
 #include <string>
 #include <iostream>
 #include <cassert>
-#include "basic.h"
 #include "debug.h"
 
 int64_t gcd(int64_t a, int64_t b) {

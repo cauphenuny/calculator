@@ -1,5 +1,4 @@
-#ifndef MATRIX_H
-#define MATRIX_H
+#pragma once
 
 #include "vector.h"
 #include "debug.h"
@@ -18,19 +17,22 @@ public:
     Matrix(size_t row, size_t col):
         Vector<rowVector<T>>(row, rowVector<T>(col)), 
         _m(col) {
+        //debuginfo;
     }
     Matrix(size_t row, size_t col, T t):
         Vector<rowVector<T>>(row, rowVector<T>(col, t)),
         _m(col) {
+        //debuginfo;
     }
     Matrix(const Matrix<T>& mat):
         Vector<rowVector<T>>(mat),
         _m(mat._m) {
+        //debuginfo;
     }
     Matrix(Matrix<T>&& mat):
         Vector<rowVector<T>>(mat),
         _m(mat._m) {
-        debugi << "copy constructor called";
+        //debugi << "copy constructor called";
     }
     Matrix<T>& operator= (const Matrix<T>& mat) {
         if (this != &mat) {
@@ -235,7 +237,7 @@ public:
     static Matrix<T> id(int n) {
         Matrix<T> mat(n, n);
         for (int i = 1; i <= n; i++) {
-            mat[i][i] = 1;
+            mat[i][i] = T(1);
         }
         return mat;
     }
@@ -243,12 +245,10 @@ public:
         Matrix<T> mat(row, col);
         for (int i = 1; i <= row; i++) {
             for (int j = 1; j <= col; j++) {
-                mat[i][j] = randint(-1000, 1000);
+                mat[i][j] = T(randint(-10, 10));
             }
         }
         return mat;
     }
 };
 
-
-#endif

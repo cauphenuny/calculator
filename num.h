@@ -1,19 +1,19 @@
-#ifndef NUM_H
-#define NUM_H
+#pragma once
 
 #include <string>
 #include <iostream>
 #include <cassert>
 #include "debug.h"
+#include "int.h"
 
-int64_t gcd(int64_t a, int64_t b) {
+Integer gcd(Integer a, Integer b) {
     return b == 0 ? a : gcd(b, a % b);
 }
 
 class Num { // rational Num
 private:
-    int64_t up; // numerator
-    int64_t down; // denominator
+    Integer up; // numerator
+    Integer down; // denominator
 
 public:
     friend std::istream& operator>> (std::istream &, Num&);
@@ -21,8 +21,8 @@ public:
 
     void format() {
         assert(down != 0);
-        if (up) {
-            int64_t g = gcd(up, down);
+        if (up != 0) {
+            Integer g = gcd(up, down);
             up /= g, down /= g;
         } else {
             down = 1;
@@ -30,6 +30,7 @@ public:
         if (down < 0) {
             up = -up, down = -down;
         }
+        //debugi << "up = " << up << " down = " << down << std::endl;
     }
 
     bool neg() const { // negative
@@ -39,11 +40,15 @@ public:
         return up > 0;
     }
 
-    Num(int64_t numerator = 0, int64_t denominator = 1): up(numerator), down(denominator) {}
+    Num(long long val = 0): up(val), down(1) {}
+    Num(const Integer& numerator, const Integer& denominator):
+        up(numerator),
+        down(denominator)
+    {}
     Num(const Num& n): up(n.up), down(n.down) {}
     Num(const std::string& str) {
         auto c = str.begin();
-        int64_t sig = 0;
+        int sig = 0;
         while (c != str.end() && !isdigit(*c)) {
             sig = (*c == '-'), c++;
         }
@@ -66,7 +71,7 @@ public:
         format();
     }
 
-    void operator= (const int64_t& val) {
+    void operator= (const Integer& val) {
         up = val, down = 1;
     }
     Num operator- () const {
@@ -77,7 +82,7 @@ public:
     }
     Num operator+ (const Num& val) const {
         Num res;
-        int64_t g = gcd(down, val.down);
+        Integer g = gcd(down, val.down);
         res.up = up * (val.down / g) + val.up * (down / g);
         res.down = down / g * val.down;
         res.format();
@@ -85,7 +90,7 @@ public:
     }
     Num operator- (const Num& val) const {
         Num res;
-        int64_t g = gcd(down, val.down);
+        Integer g = gcd(down, val.down);
         res.up = up * (val.down / g) - val.up * (down / g);
         res.down = down / g * val.down;
         res.format();
@@ -102,7 +107,7 @@ public:
         return res;
     }
     Num& operator+= (const Num& val) {
-        int64_t g = gcd(down, val.down);
+        Integer g = gcd(down, val.down);
         up *= (val.down / g);
         up += val.up * (down / g);
         down *= (val.down / g);
@@ -110,7 +115,7 @@ public:
         return *this;
     }
     Num& operator-= (const Num& val) {
-        int64_t g = gcd(down, val.down);
+        Integer g = gcd(down, val.down);
         up *= (val.down / g);
         up -= val.up * (down / g);
         down *= (val.down / g);
@@ -158,8 +163,8 @@ public:
 std::istream& operator>> (std::istream &is, Num& n) {
     std::string str;
     is >> str;
-    n = str;
-    //debugil(n);
+    //debugi << std::endl;
+    n = Num(str);
     return is;
 }
 
@@ -177,4 +182,3 @@ std::ostream& operator<< (std::ostream &os, const Num& n) {
     return os;
 }
 
-#endif

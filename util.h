@@ -1,11 +1,11 @@
-#ifndef UTIL_H
-#define UTIL_H
+#pragma once
 
+#define _min 1.3
+#define _max 3
 template<typename T>
 class MemoryPool {
     T* _data;
-    size_t _siz, _cap;
-    float _min, _max;
+    uint32_t _siz, _cap;
     size_t size() const {
         return _siz;
     }
@@ -36,11 +36,9 @@ class MemoryPool {
     const T& operator[](size_t index) const {
         return _data[index];
     }
-    MemoryPool(size_t siz = 1, float min = 1.2, float max = 3) {
+    MemoryPool(size_t siz = 1) {
         _siz = siz;
         _cap = siz * _min;
-        _min = min;
-        _max = max;
         _data = new T[_cap];
     }
     MemoryPool(const MemoryPool& p) {
@@ -56,5 +54,5 @@ class MemoryPool {
         p._data = nullptr;
     }
 };
-
-#endif
+#undef _min
+#undef _max

@@ -7,6 +7,7 @@
 #define debugw(x) std::cerr << #x << " = " << (x) << " "
 #define debugl(x) std::cerr << #x << " = " << (x) << std::endl
 #define debugi std::cerr << __FILE__ << ":" << __LINE__ << ", " << __func__ << ": "
+#define debuginfo std::cerr << __FILE__ << ":" << __LINE__ << ", " << __func__ << "(...)\n";
 #define debugil(x) std::cerr << __FILE__ << ":" << __LINE__ << ", " << __func__ << ": " << #x << " = " << (x) << std::endl
 #define debug std::cerr 
 

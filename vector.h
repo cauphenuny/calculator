@@ -1,5 +1,4 @@
-#ifndef VECT_H
-#define VECT_H
+#pragma once
 
 #include "debug.h"
 #include <cstdio>
@@ -16,17 +15,23 @@ protected:
 public:
     Vector(): _data(nullptr) {}
     Vector(size_t n) {
+        //debugi << "#1 start n = " << n << "\n";
         _n = n;
         _data = new T[n];
         //debugi << "#1 done n = " << n << "\n";
     }
     Vector(size_t n, const T t) {
+        //debugi << "#2 start n = " << n << "\n";
         _n = n;
         _data = new T[_n];
         for (size_t i = 0; i < _n; i++) {
             _data[i] = T(t);
         }
         //debugi << "#2 done n = " << n << "\n";
+        for (size_t i = 0; i < _n; i++) {
+            //debug << _data[i] << "\n";
+        }
+        //debug << "\n";
     }
     Vector(const Vector<T>& v) {
         _n = v._n;
@@ -92,6 +97,7 @@ public:
 
     size_t size() const { return _n; }
     friend std::istream& operator>> (std::istream& is, Vector<T>& vec) {
+        //debugi << std::endl;
         for (size_t i = 1; i <= vec.size(); i++) {
             is >> vec[i];
         }
@@ -217,5 +223,3 @@ class rowVector : public Vector<T> {
         return os;
     }
 };
-
-#endif

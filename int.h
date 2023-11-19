@@ -21,6 +21,7 @@ public:
     Integer& operator-=(const Integer&);
     Integer& operator*=(const Integer&);
     Integer& operator/=(const Integer&);
+    Integer& operator%=(const Integer&);
 
     friend Integer operator+(const Integer&, const Integer&);
     friend Integer operator-(const Integer&, const Integer&);
@@ -38,14 +39,14 @@ public:
 };
 
 #else
-#ifdef RELEASE
+#ifdef NATIVE
 
 using Integer = long long;
 
 #else
 
 #include "int_alt.h"
-using Integer = sjtu::int2048;
+using Integer = legendstane::BigInt;
 
 #endif
 #endif // ifdef DEV

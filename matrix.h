@@ -70,6 +70,9 @@ public:
         }
     }
     void add(size_t row1, size_t row2, const T val) {
+        //debug << "------------------------\n";
+        //debugil(val);
+        //debugil((*this)[row2][1]);
         (*this)[row1] += (*this)[row2] * val;
         if (_bind != nullptr) {
             _bind->add(row1, row2, val);
@@ -98,28 +101,31 @@ public:
         size_t _n = mat._n;
         //debug << mat;
         while (row <= _n && col <= _m) {
+            //debugil(row), debugil(col);
             size_t targ = 0; // target row
             for (size_t cand = row; cand <= _n; cand++) { // candidate row
-                if (mat[cand][col] != 0) {
+                if (mat[cand][col] != T(0)) {
                     targ = cand;
                     break;
                 }
             }
-            //debugl(targ);
+            //debugil(targ);
             if (!targ) {
                 col++;
                 continue;
             }
             if (row != targ) mat.swap(row, targ);
-            //debug << "----before div " << mat[row][col] << "--------\n";
+            //debug << "----before div " << mat[row][col] << "--------\n" << mat;
             mat.div(row, mat[row][col]);
-            //debug << "----after div -----\n" << mat;
+            //debug << "----after div row " << row << " -----\n" << mat;
             for (size_t nrow = row + 1; nrow <= _n; nrow++) { // next row
-                if (mat[nrow][col] != 0) {
-                    mat.add(nrow, row, -mat[nrow][col] / mat[row][col]);
+                if (mat[nrow][col] != T(0)) {
+                    //debug << "nrow " << nrow << "k = " << -mat[nrow][col] << std::endl;
+                    mat.add(nrow, row, -mat[nrow][col]);
                 }
             }
-            row++;
+            //debug << "----after clearing column" << col << " -----\n" << mat;
+            row++, col++;
         }
         return mat;
     }
@@ -156,20 +162,27 @@ public:
         Matrix<T>& mat = *this;
         assert(mat._n == mat._m);
         mat.eliminate();
+        debugi << "eliminated\n";
         for (size_t i = mat._n; i > 1; i--) {
             for (size_t j = i - 1; j >= 1; j--) {
                 if (mat[j][i] != 0) {
                     add(j, i, -mat[j][i]);
+                    //debug << mat;
                 }
             }
         }
+        debugi << "identified\n" << mat;
         return mat;
     }
     Matrix<T> inverse() {
         Matrix<T> tmp(*this);
+        debugi << "copied\n";
         *this = Matrix<T>::id(this->_n);
+        debugi << "reseted\n";
         tmp.bind(*this);
+        debugi << "linked\n";
         tmp.identify();
+        debugi << "calculated\n";
         return *this;
     }
 
@@ -245,7 +258,7 @@ public:
         Matrix<T> mat(row, col);
         for (int i = 1; i <= row; i++) {
             for (int j = 1; j <= col; j++) {
-                mat[i][j] = T(randint(-10, 10));
+                mat[i][j] = T(randint(-1000, 1000));
             }
         }
         return mat;

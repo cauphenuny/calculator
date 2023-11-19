@@ -6,9 +6,10 @@
 #include "debug.h"
 #include "int.h"
 
-Integer gcd(Integer a, Integer b) {
-    return b == 0 ? a : gcd(b, a % b);
-}
+//Integer gcd(Integer a, Integer b) {
+    //debugi << "a = " << a << ", b = " << b << std::endl;
+//    return b == Integer(0) ? a : ::gcd(b, a % b);
+//}
 
 class Num { // rational Num
 private:
@@ -21,16 +22,19 @@ public:
 
     void format() {
         assert(down != 0);
-        if (up != 0) {
-            Integer g = gcd(up, down);
-            up /= g, down /= g;
-        } else {
-            down = 1;
-        }
+        //debugi << "up = " << up << " down = " << down << std::endl;
         if (down < 0) {
             up = -up, down = -down;
         }
-        //debugi << "up = " << up << " down = " << down << std::endl;
+        if (up != 0) {
+            //debugi << "before gcd\n";
+            Integer g = gcd(up > 0? up : -up, down);
+            //debugil(g);
+            up /= g, down /= g;
+            //debugi << "after gcd: up = " << up << " down = " << down << "\n";
+        } else {
+            down = 1;
+        }
     }
 
     bool neg() const { // negative
@@ -97,8 +101,11 @@ public:
         return res;
     }
     Num operator* (const Num& val) const {
+        //debugil(*this), //debugil(val);
         Num res(up * val.up, down * val.down);
+        //debugil(res);
         res.format();
+        //debugil(res);
         return res;
     }
     Num operator/ (const Num& val) const {
@@ -129,9 +136,13 @@ public:
         return *this;
     }
     Num& operator/= (const Num& val) {
+        //debugil(*this);
+        //debugil(val);
         up *= val.down;
         down *= val.up;
+        //debugil(*this);
         format();
+        //debugil(*this);
         return *this;
     }
     Num& operator= (const Num& val) {
@@ -174,9 +185,9 @@ std::ostream& operator<< (std::ostream &os, const Num& n) {
         os << "{" << up << "}"; 
     } else {
         if (up > 0) {
-            os << "\\dfrac{" << up << "}{" << down << "}";
+            os << "\\frac{" << up << "}{" << down << "}";
         } else {
-            os << "{-\\dfrac{" << -up << "}{" << down << "}}";
+            os << "{-\\frac{" << -up << "}{" << down << "}}";
         }
     }
     return os;

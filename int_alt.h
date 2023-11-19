@@ -1,603 +1,487 @@
-#pragma once
-
-#include "debug.h"
-
-// Integer 1:
-// 实现一个有符号的大整数类，只需支持简单的加减
-
-// Integer 2:
-// 实现一个有符号的大整数类，支持加减乘除，并重载相关运算符
-
-// 请不要使用除了以下头文件之外的其它头文件
 #include <complex>
-#include <cstdio>
-#include <cstring>
-#include <iostream>
 #include <vector>
+#include <utility>
+#include <iostream>
+#include <iomanip>
 
-// 请不要使用 using namespace std;
+namespace legendstane {
+using namespace std;
+typedef long long ll;
+typedef long double ld;
+typedef complex<ld> pt;
+const int MOD = 1e9 + 7;
+const ld PI = acos(-1.L);
 
-namespace sjtu {
-
-class int2048 {
-    // todo
-  public:
-    // 构造函数
-    int2048();
-    int2048(long long);
-    int2048(const std::string &);
-    int2048(const int2048 &);
-
-    // 以下给定函数的形式参数类型仅供参考，可自行选择使用常量引用或者不使用引用
-    // 如果需要，可以自行增加其他所需的函数
-    // ===================================
-    // Integer1
-    // ===================================
-
-    // 读入一个大整数
-    void read(const std::string &);
-    // 输出储存的大整数，无需换行
-    void print();
-
-    // 加上一个大整数
-    int2048 &add(const int2048);
-    // 返回两个大整数之和
-    friend int2048 add(int2048, const int2048);
-
-    // 减去一个大整数
-    int2048 &minus(const int2048);
-    // 返回两个大整数之差
-    friend int2048 minus(int2048, const int2048);
-
-    // ===================================
-    // Integer2
-    // ===================================
-
-    int2048 operator+() const;
-    int2048 operator-() const;
-
-    int2048 &operator=(const int2048);
-
-    int2048 &operator+=(const int2048);
-    friend int2048 operator+(int2048, const int2048);
-
-    int2048 &operator-=(const int2048);
-    friend int2048 operator-(int2048, const int2048);
-
-    int2048 &operator*=(const int2048);
-    friend int2048 operator*(int2048, const int2048);
-
-    int2048 &operator/=(const int2048);
-    friend int2048 operator/(int2048, const int2048);
-
-    int2048 &operator%=(const int2048);
-    friend int2048 operator%(int2048, const int2048);
-
-    friend std::istream &operator>>(std::istream &, int2048 &);
-    friend std::ostream &operator<<(std::ostream &, const int2048 &);
-
-    friend bool operator==(const int2048 &, const int2048 &);
-    friend bool operator!=(const int2048 &, const int2048 &);
-    friend bool operator<(const int2048 &, const int2048 &);
-    friend bool operator>(const int2048 &, const int2048 &);
-    friend bool operator<=(const int2048 &, const int2048 &);
-    friend bool operator>=(const int2048 &, const int2048 &);
-
-    int tota;int sym;
-    std::vector<int> a;
-};
-
-const int Amodd = 10000000;
-const int zip = 7;
-const long long Amod = 1ll * 4179340454199820289, Ag = 3,
-                Agi = 1ll * 1393113484733273430;
-// const int modd = 10000;
-// const int zip = 4;
-// const long long mod = 1ll * 998244353, g = 3, gi = 1ll * 332748118;
-int Ar[(1 << 19) + 10];
-int lim;
-long long Ap[500010], Aq[500010];
-int2048 temp;
-int2048::int2048() {
-    //debugi << "()\n";
-    int i;
-    if (a.size()) {
-        for (i = 0; i < a.size(); i++) a[i] = 0;
-    } else
-        a.push_back(0);
-    tota = 0;
-    sym = 1;
-}
-int2048::int2048(long long x) {
-    //debugi << "(long long)\n";
-    int i;
-    if (a.size()) {
-        for (i = 0; i < a.size(); i++) a[i] = 0;
+template <class T> struct cplx {
+    T x, y;
+    cplx() {
+        x = 0.0;
+        y = 0.0;
     }
-    tota = -1;
-    sym = (x < 0 ? -1 : 1);
-    x *= sym;
-    while (x) {
-        tota++;
-        if (a.size() > tota)
-            a[tota] = x % Amodd;
-        else
-            a.push_back(x % Amodd);
-        x /= Amodd;
+    cplx(T nx, T ny = 0) {
+        x = nx;
+        y = ny;
     }
-    if (tota < 0) {
-        tota = 0;
-        a.push_back(0);
+    cplx operator+(const cplx &c) const {
+        return {x + c.x, y + c.y};
     }
-    //debugi << "done\n";
-}
-int2048::int2048(const std::string &s) {
-    //debugi << "(string)\n";
-    tota = -1;
-    int j, m = s.length(), beg;
-    if (a.size()) {
-        for (int i = 0; i < a.size(); i++) a[i] = 0;
+    cplx operator-(const cplx &c) const {
+        return {x - c.x, y - c.y};
     }
-    sym = (1 - ((s[0] == '-') << 1));
-    beg = (s[0] == '-');
-    for (int i = m - 1; i >= beg; i -= zip) {
-        tota++;
-        if (a.size() > tota)
-            a[tota] = 0;
-        else
-            a.push_back(0);
-        for (j = std::max(beg, i - zip + 1); j <= i; j++)
-            a[tota] = (a[tota] << 1) + (a[tota] << 3) + (s[j] & 15);
+    cplx operator*(const cplx &c) const {
+        return {x * c.x - y * c.y, x * c.y + y * c.x};
     }
-    while (tota && !a[tota]) tota--;
-    if (!a[tota]) sym = 1;
-}
-int2048::int2048(const int2048 &x) {
-    //debugi << "(copy)\n";
-    int i;
-    if (a.size()) {
-        for (i = 0; i < a.size(); i++) a[i] = 0;
+    cplx &operator*=(const cplx &c) {
+        return *this = {x * c.x - y * c.y, x * c.y + y * c.x};
     }
-    tota = x.tota;
-    //debugil(tota);
-    sym = x.sym;
-    for (i = 0; i <= tota; i++) {
-        //debugil(i);
-        if (a.size() > i)
-            a[i] = x.a[i];
-        else
-            a.push_back(x.a[i]);
-    }
-}
-int2048 &int2048::operator=(const int2048 x) {
-    int i, j = a.size();
-    for (i = 0; i < j; i++) a[i] = 0;
-    for (i = j; i <= x.tota; i++) a.push_back(0);
-    tota = x.tota;
-    sym = x.sym;
-    for (i = 0; i <= tota; i++) a[i] = x.a[i];
-    return (*this);
-}
-int2048 int2048::operator+() const {
-    return (*this);
-}
-int2048 int2048::operator-() const {
-    int2048 y = (*this);
-    y.sym *= -1;
-    return y;
-}
-void int2048::print() {
-    int i, j;
-    if (sym == -1) printf("-");
-    for (i = tota; i >= 0; i--) {
-        int t = 1;
-        if (i == tota) {
-            printf("%d", a[i]);
-            continue;
-        }
-        for (j = 1; j < zip; j++) {
-            t *= 10;
-            if (!(a[i] / t)) printf("0");
-        }
-        printf("%d", a[i]);
-    }
-    return;
-}
-void int2048::read(const std::string &s) {
-    int j, m = s.length(), beg, x = a.size();
-    //  printf("%d %d ",tota,m);
-    if (a.size()) {
-        for (int i = 0; i < a.size(); i++) a[i] = 0;
-    }
-    tota = -1;
-    sym = (1 - ((s[0] == '-') << 1));
-    beg = (s[0] == '-');
-    for (int i = m - 1; i >= beg; i -= zip) {
-        tota++;
-        if (tota >= x) a.push_back(0);
-        for (j = std::max(beg, i - zip); j <= i; j++)
-            a[tota] = (a[tota] << 1) + (a[tota] << 3) + (s[j] & 15);
-    }
-    if (!a[tota]) sym = 1;
-    //  (*this).print();
-    //  printf("!%d\n", (*this).a[2]);
-    return;
-}
-int2048 &int2048::add(const int2048 xx) {
-    int2048 x = xx;
-    int i, j, m = std::max(tota, x.tota), seg = sym * x.sym, com = 0;
-    while (a.size() <= m + 1) a.push_back(0);
-    while (x.a.size() <= m + 1) x.a.push_back(0);
-    for (i = m; i >= 0; i--) {
-        if (a[i] > x.a[i]) {
-            com = 1;
-            break;
-        }
-        if (a[i] < x.a[i]) {
-            com = -1;
-            break;
-        }
-    }
-    //  printf("!!!"); (*this).print(); printf("\n");
-    //  x.print(); printf("\n");
-    if (seg == 1) {
-        while (a.size() <= m + 2) a.push_back(0);
-        while (x.a.size() <= m + 2) x.a.push_back(0);
-        for (i = 0; i <= m; i++) a[i] += x.a[i];
-        //	printf("$ %d ",a[2]);
-        for (i = 0; i <= m; i++)
-            if (a[i] >= Amodd) {
-                a[i + 1]++;
-                a[i] -= Amodd;
-            }
-        //	if (a[m+1])printf("!");
-        m += (a[m + 1] != 0);
-        tota = m;
-        //	printf("!%d %d ",tota, a[tota+1]);
-        //	(*this).print();
-        //	printf("\n");
-        return (*this);
-    }
-    //  printf("! %d %d\n", sym, com);
-    for (i = 0; i <= m; i++) a[i] = a[i] * com + x.a[i] * com * (-1);
-    for (i = 0; i <= m; i++)
-        if (a[i] < 0) {
-            a[i] += Amodd;
-            a[i + 1] -= 1;
-        }
-    tota = m;
-    while (!a[tota] && tota > 0) tota--;
-    sym *= com;
-    if (!a[tota]) sym = 1;
-    return (*this);
-}
-int2048 add(int2048 y, const int2048 x) {
-    return y.add(x);
-}
-int2048 &int2048::minus(const int2048 x) {
-    //  printf("m");
-    sym *= -1;
-    (*this).add(x);
-    sym *= -1;
-    if (!a[tota]) sym = 1;
-    return (*this);
-}
-int2048 minus(int2048 y, const int2048 x) {
-    return y.minus(x);
-}
-int2048 operator+(int2048 y, const int2048 x) {
-    return add(y, x);
-}
-int2048 operator-(int2048 y, const int2048 x) {
-    return minus(y, x);
-}
-long long qpow(long long x, long long y) {
-    long long now = 1;
-    while (y) {
-        if (y & 1) now = ((__int128)now * (__int128)x % (__int128)Amod);
-        x = ((__int128)x * (__int128)x % (__int128)Amod);
-        y >>= 1;
-    }
-    return now;
-}
-void NTT(long long *b, int lim, int opt) {
-    int i, j, mid, k;
-    long long x, y, w, gn;
-    //  for (i = 0; i < lim; i++) b[i] = q[i];
-    for (i = 0; i < lim; i++)
-        if (i < Ar[i]) std::swap(b[i], b[Ar[i]]);
-    for (mid = 2; mid <= lim; mid <<= 1) {
-        gn = qpow(opt == 1 ? Ag : Agi, (Amod - 1) / mid);
-        k = mid >> 1;
-        for (i = 0; i < lim; i += mid) {
-            w = 1;
-            for (j = i; j < i + k; j++) {
-                x = b[j];
-                y = ((__int128)b[j + k] * (__int128)w % (__int128)Amod);
-                b[j] = (((__int128)x + (__int128)y) % (__int128)Amod);
-                b[j + k] = (((__int128)x - (__int128)y + (__int128)Amod) %
-                            (__int128)Amod);
-                w = ((__int128)w * (__int128)gn % (__int128)Amod);
-            }
-        }
-    }
-    if (opt == -1) {
-        //    for (k = 1; k <= (lim >> 1); k++) {x = b[i]; b[i] = b[lim - i];
-        //    b[lim - i] = x;} std:: reverse (b + 1, b + lim - 1);
-        long long inv = qpow(lim, Amod - 1ll * 2);
-        for (i = 0; i < lim; i++)
-            b[i] = ((__int128)b[i] * (__int128)inv % (__int128)Amod);
-    }
-    return;
-}
-int2048 operator*(int2048 y, const int2048 x) {
-    //  printf ("%lld\n", qpow(g, (mod - 2)));
-    int i, j, m = std::max(y.tota, x.tota), seg = y.sym * x.sym, lim = 1,
-              lglim = 0;
-    while (lim < ((m + 1) << 1)) lim <<= 1, lglim++;
-    y.a.reserve(lim);
-    while (y.a.size() < lim) y.a.push_back(0);
-    for (i = 0; i < lim; i++) {
-        Ar[i] = (Ar[i >> 1] >> 1) | ((i & 1) << lglim - 1);
-        Ap[i] = y.a[i];
-        if (i <= x.tota)
-            Aq[i] = x.a[i];
-        else
-            Aq[i] = 0;
-    }
-    //  for (i = 0; i < lim; i++) printf("%lld ", Ap[i]); printf("\n");
-    //  for (i = 0; i < lim; i++) printf("%lld ", Aq[i]); printf("\n");
-    NTT(Ap, lim, 1);
-    NTT(Aq, lim, 1);
-    for (i = 0; i < lim; i++)
-        Ap[i] = ((__int128)Ap[i] * (__int128)Aq[i] % (__int128)Amod);
-    NTT(Ap, lim, -1);
-    for (i = lim - 1; i >= 0; i--)
-        if (Ap[i]) {
-            y.tota = i;
-            break;
-        }
-    //  for (i = 0; i <= y.tota; i++) printf("%lld ", Ap[i]); printf("\n");
-    for (i = 0; i <= y.tota; i++)
-        if (Ap[i] >= (long long)Amodd) {
-            Ap[i + 1] += Ap[i] / (long long)Amodd;
-            Ap[i] %= (long long)Amodd;
-        }
-    //	for (i = 0; i <= y.tota; i++) printf("%lld ", Ap[i]); printf("\n");
-    while (Ap[y.tota + 1]) {
-        Ap[y.tota + 1] += Ap[y.tota] / (long long)Amodd;
-        Ap[y.tota] %= (long long)Amodd;
-        y.tota++;
-    }
-    for (i = 0; i <= y.tota; i++) y.a[i] = (int)Ap[i];
-    for (i = y.tota + 1; i <= lim - 1; i++) y.a[i] = 0;
-    for (i = 0; i < lim; i++) {
-        Ap[i] = 0;
-        Aq[i] = 0;
-    }
-    y.sym *= x.sym;
-    return y;
-}
-int2048 &int2048::operator+=(const int2048 x) {
-    return (*this).add(x);
-}
-int2048 &int2048::operator-=(const int2048 x) {
-    return (*this).minus(x);
-}
-int2048 &int2048::operator*=(const int2048 x) {
-    int2048 y = (*this);
-    y = (y * x);
-    (*this) = y;
-    return (*this);
-}
-std::istream &operator>>(std::istream &is, int2048 &y) {
-    long long s;
-    is >> s;
-    //   int2048 x(s);
-    y = s;
-    return is;
-}
-std::ostream &operator<<(std::ostream &os, const int2048 &y) {
-    int i, j;
-    if (y.sym == -1) os << "-";
-    for (i = y.tota; i >= 0; i--) {
-        int t = 1;
-        if (i == y.tota) {
-            os << y.a[i];
-            continue;
-        }
-        for (j = 1; j < zip; j++) {
-            t *= 10;
-            if (!(y.a[i] / t)) os << "0";
-        }
-        os << y.a[i];
-    }
-    return os;
-}
-bool operator==(const int2048 &x, const int2048 &y) {
-    if (x.tota != y.tota || x.sym != y.sym) return 0;
-    for (int i = 0; i <= x.tota; i++)
-        if (x.a[i] != y.a[i]) return 0;
-    return 1;
-}
-bool operator!=(const int2048 &x, const int2048 &y) {
-    return 1 ^ (x == y);
-}
-bool operator<(const int2048 &x, const int2048 &y) {
-    if (x.sym != y.sym) return (x.sym == -1);
-    if (x.tota != y.tota) return (x.tota < y.tota) ^ (x.sym == -1);
-    for (int i = x.tota; i >= 0; i--) {
-        if (x.a[i] < y.a[i]) return (x.sym == 1);
-        if (x.a[i] > y.a[i]) return (x.sym == -1);
-    }
-    return 0;
-}
-bool operator>(const int2048 &x, const int2048 &y) {
-    return y < x;
-}
-bool operator<=(const int2048 &x, const int2048 &y) {
-    return (x < y || x == y);
-}
-bool operator>=(const int2048 &x, const int2048 &y) {
-    return y <= x;
-}
-int get_dig(int2048 x) {
-    int i, j = 0;
-    while (x.a[x.tota]) {
-        x.a[x.tota] /= 10;
-        j++;
-    }
-    j += x.tota * zip;
-    return j;
-}
-int2048 timesten(int2048 x, int y) {
-    int i, j, k;
-    if (y == 0) return x;
-    if (y > 0) {
-        j = y / zip;
-        k = (int)qpow(1ll * 10, 1ll * y % zip);
-        x.a.reserve(x.tota + 1 + j + 1);
-        while (x.a.size() < x.tota + 1 + j + 1) x.a.push_back(0);
-        x.tota += j;
-        for (i = x.tota; i >= j; i--) x.a[i] = x.a[i - j];
-        for (i = j - 1; i >= 0; i--) x.a[i] = 0;
-        for (i = x.tota; i >= j; i--) {
-            x.a[i + 1] += x.a[i] / (Amodd / k);
-            x.a[i] = (x.a[i] % (Amodd / k)) * k;
-        }
-        if (x.a[x.tota + 1]) x.tota++;
-    }
-    if (y < 0) {
-        j = (-y) / zip;
-        k = (int)qpow(1ll * 10, 1ll * (-y) % zip);
-        x.tota -= j;
-        if (x.tota < 0) x.tota = 0;
-        for (i = 0; i <= x.tota; i++) x.a[i] = x.a[i + j];
-        for (i = x.tota + 1; i <= x.tota + j; i++) x.a[i] = 0;
-        for (i = 0; i <= x.tota; i++) {
-            x.a[i] /= k;
-            if (i != x.tota) x.a[i] += (x.a[i + 1] % k) * (Amodd / k);
-        }
-        if (!x.a[x.tota] && x.tota) x.tota--;
-    }
-    //  printf("!!!"); fflush(stdout);
-    return x;
-}
-int2048 miner_change(int2048 x, int2048 y,
-                            int2048 z, int range) {
-    int tmp = x.sym;
-    //  z.sym = x.sym * y.sym;
-    x.sym = 1;
-    y.sym = 1;
-    z.sym = 1;
-    long long x1 = -range, x2 = range, mi = 0;
-    bool opt;
-    int2048 w;
-    if (!x.tota && x.a[0] < range) {
-        x1 = -x.a[0];
-        x2 = x.a[0];
-    }
-    while (x1 != x2) {
-        mi = (x1 + x2 + 1) >> 1;
-        //	x.a.push_back(1); x.tota ++;
-        w = (int2048)mi;
-        opt = ((x + w) * y <= z);
-        //	x.print(); printf(" ");
-        //	y.print(); printf(" ");
-        //	(x * y).print(); printf(" ");
-        //	z.print(); printf(" %d %d \n",(x * y).tota, z.tota);
-        if (opt)
-            x1 = mi;
-        else
-            x2 = mi - 1;
-    }
-    x += (int2048)x1;
-    x.sym = tmp;
-    if (!x.a[x.tota]) x.sym = 1;
-    return x;
-}
-int2048 divide(int2048 x) {
-    int i, j = get_dig(x);
-    i = (j + 2) >> 1;
-    if (j <= 3) {
-        x.a[0] = qpow(10, j << 1) / x.a[0];
+    inline T real() const {
         return x;
     }
-    int2048 y = divide(timesten(x, i - j));
-    y = timesten(y, j - i) + timesten(y, j - i) -
-        timesten(y * y * x, -(i << 1));
-    y = miner_change(y, x, timesten((int2048)1, j << 1), 100);
-    return y;
-}
-int2048 operator/(int2048 y, const int2048 xx) {
-    int i, j, tmp;
-    int2048 x = xx, yy;
-    if (x.sym == y.sym) {
-        x.sym = 1;
-        y.sym = 1;
-    } else {
-        x.sym = -1;
-        y.sym = 1;
+    inline T imag() const {
+        return y;
     }
-    tmp = x.sym;
-    x.sym = 1;
-    //  x.sym *= y.sym;
-    if (x.tota > y.tota) return (int2048)0;
-    if (y.tota >= (x.tota << 1)) {
-        j = y.tota - (x.tota << 1) + 1;
-        //	printf("!%d\n", j);
-        y.tota += j;
-        x.tota += j;
-        y.a.reserve(y.tota + 1);
-        x.a.reserve(x.tota + 1);
-        while (y.a.size() < y.tota) y.a.push_back(0);
-        while (x.a.size() < x.tota) x.a.push_back(0);
-        for (i = x.tota; i >= j; i--) x.a[i] = x.a[i - j];
-        for (i = y.tota; i >= j; i--) y.a[i] = y.a[i - j];
-        for (i = j - 1; i >= 0; i--) {
-            x.a[i] = 0;
-            y.a[i] = 0;
+    // Only supports right scalar multiplication like p*c
+    template <class U> cplx operator*(const U &c) const {
+        return {x * c, y * c};
+    }
+    template <class U> cplx operator/(const U &c) const {
+        return {x / c, y / c};
+    }
+    template <class U> void operator/=(const U &c) {
+        x /= c;
+        y /= c;
+    }
+};
+#define polar(r, a)                                                            \
+    (cplx<ld>) {                                                               \
+        r *cos(a), r *sin(a)                                                   \
+    }
+
+const int DIG = 9, FDIG = 4;
+const int BASE = 1e9, FBASE = 1e4;
+typedef cplx<ld> Cplx;
+
+// use mulmod when taking mod by int v and v>2e9
+// you can use mod by bigint in that case too
+struct BigInt {
+    int sgn;
+    vector<int> a;
+    BigInt() : sgn(1) {
+    }
+    BigInt(ll v) {
+        *this = v;
+    }
+    BigInt &operator=(ll v) {
+        sgn = 1;
+        if (v < 0) sgn = -1, v = -v;
+        a.clear();
+        for (; v > 0; v /= BASE) a.push_back(v % BASE);
+        return *this;
+    }
+    BigInt(const BigInt &other) {
+        sgn = other.sgn;
+        a = other.a;
+    }
+    friend void swap(BigInt &a, BigInt &b) {
+        swap(a.sgn, b.sgn);
+        swap(a.a, b.a);
+    }
+    BigInt &operator=(BigInt other) {
+        swap(*this, other);
+        return *this;
+    }
+    BigInt(BigInt &&other) : BigInt() {
+        swap(*this, other);
+    }
+    BigInt(const string &s) {
+        read(s);
+    }
+    void read(const string &s) {
+        sgn = 1;
+        a.clear();
+        int k = 0;
+        for (; k < s.size() && (s[k] == '-' || s[k] == '+'); k++)
+            if (s[k] == '-') sgn = -sgn;
+        for (int i = s.size() - 1; i >= k; i -= DIG) {
+            int x = 0;
+            for (int j = max(k, i - DIG + 1); j <= i; j++)
+                x = x * 10 + s[j] - '0';
+            a.push_back(x);
+        }
+        trim();
+    }
+    friend istream &operator>>(istream &in, BigInt &v) {
+        string s;
+        in >> s;
+        v.read(s);
+        return in;
+    }
+    friend ostream &operator<<(ostream &out, const BigInt &v) {
+        if (v.sgn == -1 && !v.zero()) out << '-';
+        out << (v.a.empty() ? 0 : v.a.back());
+        for (int i = (int)v.a.size() - 2; i >= 0; --i)
+            out << setw(DIG) << setfill('0') << v.a[i];
+        return out;
+    }
+    bool operator<(const BigInt &v) const {
+        if (sgn != v.sgn) return sgn < v.sgn;
+        if (a.size() != v.a.size()) return a.size() * sgn < v.a.size() * v.sgn;
+        for (int i = (int)a.size() - 1; i >= 0; i--)
+            if (a[i] != v.a[i]) return a[i] * sgn < v.a[i] * sgn;
+        return 0;
+    }
+    bool operator>(const BigInt &v) const {
+        return v < *this;
+    }
+    bool operator<=(const BigInt &v) const {
+        return !(v < *this);
+    }
+    bool operator>=(const BigInt &v) const {
+        return !(*this < v);
+    }
+    bool operator==(const BigInt &v) const {
+        return !(*this < v) && !(v < *this);
+    }
+    bool operator!=(const BigInt &v) const {
+        return *this < v || v < *this;
+    }
+    friend int __cmp(const BigInt &x, const BigInt &y) {
+        if (x.a.size() != y.a.size()) return x.a.size() < y.a.size() ? -1 : 1;
+        for (int i = (int)x.a.size() - 1; i >= 0; --i)
+            if (x.a[i] != y.a[i]) return x.a[i] < y.a[i] ? -1 : 1;
+        return 0;
+    }
+
+    BigInt operator-() const {
+        BigInt res = *this;
+        if (zero()) return res;
+        res.sgn = -sgn;
+        return res;
+    }
+
+    void __add(const BigInt &v) {
+        if (a.size() < v.a.size()) a.resize(v.a.size(), 0);
+        for (int i = 0, carry = 0; i < max(a.size(), v.a.size()) || carry;
+             ++i) {
+            if (i == a.size()) a.push_back(0);
+            a[i] += carry + (i < (int)v.a.size() ? v.a[i] : 0);
+            carry = a[i] >= BASE;
+            if (carry) a[i] -= BASE;
         }
     }
-    yy = x;
-    j = get_dig(x);
-    //  x.print(); printf("\n");
-    x = divide(x);
-    //  x.print(); printf("\n");
-    x *= y;
-    x = timesten(x, -(j << 1));
-    //  x.print(); printf("\n");
 
-    //  yy.print(); printf("\n");
+    void __sub(const BigInt &v) {
+        for (int i = 0, carry = 0; i < (int)v.a.size() || carry; ++i) {
+            a[i] -= carry + (i < (int)v.a.size() ? v.a[i] : 0);
+            carry = a[i] < 0;
+            if (carry) a[i] += BASE;
+        }
+        this->trim();
+    }
 
-    //  y.print(); printf("\n");
-    //  x.print(); printf("\n");
-    //  x.sym = tmp;
-    //  x.print(); printf("\n");
-    //  yy.print(); printf("\n");
-    //  y.print(); printf("\n");
-    x = miner_change(x, yy, y, 10);
-    //  w.print(); printf("\n");
-    //  x.print(); printf("\n");
-    //  printf("%d\n", (x * yy <= y));
-    x.sym = tmp;
-    if (x.sym == -1 && x * yy < y) x -= 1;
-    x.sym *= y.sym;
-    return x;
+    BigInt operator+=(const BigInt &v) {
+        if (sgn == v.sgn)
+            __add(v);
+        else if (__cmp(*this, v) >= 0)
+            __sub(v);
+        else {
+            BigInt vv = v;
+            swap(*this, vv);
+            __sub(vv);
+        }
+        return *this;
+    }
+
+    BigInt operator-=(const BigInt &v) {
+        if (sgn == v.sgn) {
+            if (__cmp(*this, v) >= 0)
+                __sub(v);
+            else {
+                BigInt vv = v;
+                swap(*this, vv);
+                __sub(vv);
+                sgn = -sgn;
+            }
+        } else
+            __add(v);
+        return *this;
+    }
+
+    template <typename L, typename R>
+    typename enable_if<is_convertible<L, BigInt>::value &&
+                           is_convertible<R, BigInt>::value &&
+                           is_lvalue_reference<R &&>::value,
+                       BigInt>::type friend
+    operator+(L &&l, R &&r) {
+        BigInt result(std::forward<L>(l));
+        result += r;
+        return result;
+    }
+    template <typename L, typename R>
+    typename enable_if<is_convertible<L, BigInt>::value &&
+                           is_convertible<R, BigInt>::value &&
+                           is_rvalue_reference<R &&>::value,
+                       BigInt>::type friend
+    operator+(L &&l, R &&r) {
+        BigInt result(std::move(r));
+        result += l;
+        return result;
+    }
+    template <typename L, typename R>
+    typename enable_if<is_convertible<L, BigInt>::value &&
+                           is_convertible<R, BigInt>::value,
+                       BigInt>::type friend
+    operator-(L &&l, R &&r) {
+        BigInt result(std::forward<L>(l));
+        result -= r;
+        return result;
+    }
+
+    friend pair<BigInt, BigInt> divmod(const BigInt &a1, const BigInt &b1) {
+        ll norm = BASE / (b1.a.back() + 1);
+        BigInt a = a1.abs() * norm, b = b1.abs() * norm, q = 0, r = 0;
+        q.a.resize(a.a.size());
+        for (int i = a.a.size() - 1; i >= 0; i--) {
+            r *= BASE;
+            r += a.a[i];
+            ll s1 = r.a.size() <= b.a.size() ? 0 : r.a[b.a.size()];
+            ll s2 = r.a.size() <= b.a.size() - 1 ? 0 : r.a[b.a.size() - 1];
+            ll d = ((ll)BASE * s1 + s2) / b.a.back();
+            r -= b * d;
+            while (r < 0) r += b, --d;
+            q.a[i] = d;
+        }
+        q.sgn = a1.sgn * b1.sgn;
+        r.sgn = a1.sgn;
+        q.trim();
+        r.trim();
+        auto res = make_pair(q, r / norm);
+        if (res.second < 0) res.second += b1;
+        return res;
+    }
+    BigInt operator/(const BigInt &v) const {
+        return divmod(*this, v).first;
+    }
+    BigInt operator%(const BigInt &v) const {
+        return divmod(*this, v).second;
+    }
+    void operator/=(int v) {
+        if (llabs(v) >= BASE) {
+            *this /= BigInt(v);
+            return;
+        }
+        if (v < 0) sgn = -sgn, v = -v;
+        for (int i = (int)a.size() - 1, rem = 0; i >= 0; --i) {
+            ll cur = a[i] + rem * (ll)BASE;
+            a[i] = (int)(cur / v);
+            rem = (int)(cur % v);
+        }
+        trim();
+    }
+    BigInt operator/(int v) const {
+        if (llabs(v) >= BASE) return *this / BigInt(v);
+        BigInt res = *this;
+        res /= v;
+        return res;
+    }
+    void operator/=(const BigInt &v) {
+        *this = *this / v;
+    }
+    ll operator%(ll v) const {
+        int m = 0;
+        for (int i = a.size() - 1; i >= 0; --i) m = (a[i] + m * (ll)BASE) % v;
+        return m * sgn;
+    }
+    void operator*=(int v) {
+        if (llabs(v) >= BASE) {
+            *this *= BigInt(v);
+            return;
+        }
+        if (v < 0) sgn = -sgn, v = -v;
+        for (int i = 0, carry = 0; i < a.size() || carry; ++i) {
+            if (i == a.size()) a.push_back(0);
+            ll cur = a[i] * (ll)v + carry;
+            carry = (int)(cur / BASE);
+            a[i] = (int)(cur % BASE);
+        }
+        trim();
+    }
+    BigInt operator*(int v) const {
+        if (llabs(v) >= BASE) return *this * BigInt(v);
+        BigInt res = *this;
+        res *= v;
+        return res;
+    }
+
+    static vector<int> convert_base(const vector<int> &a, int old_digits,
+                                    int new_digits) {
+        vector<ll> p(max(old_digits, new_digits) + 1);
+        p[0] = 1;
+        for (int i = 1; i < (int)p.size(); i++) p[i] = p[i - 1] * 10;
+        vector<int> res;
+        ll cur = 0;
+        int cur_digits = 0;
+        for (int i = 0; i < (int)a.size(); i++) {
+            cur += a[i] * p[cur_digits];
+            cur_digits += old_digits;
+            while (cur_digits >= new_digits) {
+                res.push_back((ll)(cur % p[new_digits]));
+                cur /= p[new_digits];
+                cur_digits -= new_digits;
+            }
+        }
+        res.push_back((int)cur);
+        while (!res.empty() && !res.back()) res.pop_back();
+        return res;
+    }
+
+    void fft(vector<Cplx> &a, bool invert) const {
+        int n = a.size();
+        for (int i = 1, j = 0; i < n; ++i) {
+            int bit = n / 2;
+            for (; j >= bit; bit /= 2) j -= bit;
+            j += bit;
+            if (i < j) swap(a[i], a[j]);
+        }
+        for (int len = 2; len <= n; len *= 2) {
+            ld ang = 2 * PI / len * (invert ? -1 : 1);
+            Cplx wlen = polar(1, ang);
+            for (int i = 0; i < n; i += len) {
+                Cplx w(1);
+                for (int j = 0; j < len / 2; ++j) {
+                    Cplx u = a[i + j], v = a[i + j + len / 2] * w;
+                    a[i + j] = u + v;
+                    a[i + j + len / 2] = u - v;
+                    w *= wlen;
+                }
+            }
+        }
+        if (invert)
+            for (int i = 0; i < n; ++i) a[i] /= n;
+    }
+    void multiply_fft(const vector<int> &a, const vector<int> &b,
+                      vector<int> &res) const {
+        vector<Cplx> fa(a.begin(), a.end()), fb(b.begin(), b.end());
+        int n = 1;
+        while (n < max(a.size(), b.size())) n *= 2;
+        n *= 2;
+        fa.resize(n);
+        fb.resize(n);
+        fft(fa, 0);
+        fft(fb, 0);
+        for (int i = 0; i < n; ++i) fa[i] *= fb[i];
+        fft(fa, 1);
+        res.resize(n);
+        ll carry = 0;
+        for (int i = 0; i < n; i++) {
+            ll t = (ll)(fa[i].real() + 0.5) + carry;
+            carry = t / FBASE;
+            res[i] = t % FBASE;
+        }
+    }
+    static inline int rev_incr(int a, int n) {
+        int msk = n / 2, cnt = 0;
+        while (a & msk) {
+            cnt++;
+            a <<= 1;
+        }
+        a &= msk - 1;
+        a |= msk;
+        while (cnt--) a >>= 1;
+        return a;
+    }
+    static vector<Cplx> FFT(vector<Cplx> v, int dir = 1) {
+        Cplx wm, w, u, t;
+        int n = v.size();
+        vector<Cplx> V(n);
+        for (int k = 0, a = 0; k < n; ++k, a = rev_incr(a, n))
+            V[a] = v[k] / ld(dir > 0 ? 1 : n);
+        for (int m = 2; m <= n; m <<= 1) {
+            wm = polar((ld)1, dir * 2 * PI / m);
+            for (int k = 0; k < n; k += m) {
+                w = 1;
+                for (int j = 0; j < m / 2; ++j, w *= wm) {
+                    u = V[k + j];
+                    t = w * V[k + j + m / 2];
+                    V[k + j] = u + t;
+                    V[k + j + m / 2] = u - t;
+                }
+            }
+        }
+        return V;
+    }
+    static void convolution(const vector<int> &a, const vector<int> &b,
+                            vector<int> &c) {
+        int sz = a.size() + b.size() - 1;
+        int n = 1 << int(ceil(log2(sz)));
+        vector<Cplx> av(n, 0), bv(n, 0), cv;
+        for (int i = 0; i < a.size(); i++) av[i] = a[i];
+        for (int i = 0; i < b.size(); i++) bv[i] = b[i];
+        cv = FFT(bv);
+        bv = FFT(av);
+        for (int i = 0; i < n; i++) av[i] = bv[i] * cv[i];
+        cv = FFT(av, -1);
+        c.resize(n);
+        ll carry = 0;
+        for (int i = 0; i < n; i++) {
+            ll t = ll(cv[i].real() + 0.5) + carry;
+            carry = t / FBASE;
+            c[i] = t % FBASE;
+        }
+    }
+    BigInt mul_simple(const BigInt &v) const {
+        BigInt res;
+        res.sgn = sgn * v.sgn;
+        res.a.resize(a.size() + v.a.size());
+        for (int i = 0; i < a.size(); i++)
+            if (a[i])
+                for (int j = 0, carry = 0; j < v.a.size() || carry; j++) {
+                    ll cur = res.a[i + j] +
+                             (ll)a[i] * (j < v.a.size() ? v.a[j] : 0) + carry;
+                    carry = (int)(cur / BASE);
+                    res.a[i + j] = (int)(cur % BASE);
+                }
+        res.trim();
+        return res;
+    }
+    BigInt mul_fft(const BigInt &v) const {
+        BigInt res;
+        convolution(convert_base(a, DIG, FDIG), convert_base(v.a, DIG, FDIG),
+                    res.a);
+        res.a = convert_base(res.a, FDIG, DIG);
+        res.trim();
+        return res;
+    }
+    void operator*=(const BigInt &v) {
+        *this = *this * v;
+    }
+    BigInt operator*(const BigInt &v) const {
+        if (1LL * a.size() * v.a.size() <= 1000111) return mul_simple(v);
+        return mul_fft(v);
+    }
+
+    BigInt abs() const {
+        BigInt res = *this;
+        res.sgn *= res.sgn;
+        return res;
+    }
+    void trim() {
+        while (!a.empty() && !a.back()) a.pop_back();
+    }
+    bool zero() const {
+        return a.empty() || (a.size() == 1 && !a[0]);
+    }
+    friend BigInt gcd(const BigInt &a, const BigInt &b) {
+        return b.zero() ? a : gcd(b, a % b);
+    }
+};
+BigInt power(BigInt a, ll k) {
+    BigInt ans = 1;
+    while (k > 0) {
+        if (k & 1) ans *= a;
+        a *= a;
+        k >>= 1;
+    }
+    return ans;
 }
-int2048 operator%(int2048 y, const int2048 xx) {
-    return y - (y / xx) * xx;
-}
-int2048 &int2048::operator/=(const int2048 x) {
-    int2048 y = (*this);
-    y = (y / x);
-    (*this) = y;
-    return (*this);
-}
-int2048 &int2048::operator%=(const int2048 x) {
-    int2048 y = (*this);
-    y = (y % x);
-    (*this) = y;
-    return (*this);
-}
-}
+} // namespace legendstane

@@ -21,7 +21,7 @@ class MemoryPool {
         if (_data != nullptr) {
             if ((size_t)(new_n * _min) > _cap || 
                 (size_t)(new_n * _max) < _cap) {
-                T* new_data = new T[(size_t)new_n * _min];
+                T* new_data = new T[(size_t)(new_n * _min)];
                 memcpy(new_data, _data, sizeof(T) * _cap);
                 _cap = (size_t)new_n * _min;
                 _data = new_data;

@@ -156,13 +156,13 @@ public:
         return res;
     }
     template<typename T2>
-    Vector<T>& operator*= (const T2& c) {
+    Vector<T>& operator*= (const T2 c) {
         for (size_t i = 1; i <= _n; i++) {
             (*this)[i] *= c;
         }
         return *this;
     }
-    friend Vector<T> operator* (const T& c, const Vector<T>& v) {
+    friend Vector<T> operator* (const T c, const Vector<T>& v) {
         size_t n = v.size();
         Vector<T> res(n);
         for (size_t i = 1; i <= n; i++) {
@@ -171,7 +171,7 @@ public:
         return res;
     }
 
-    friend Vector<T> operator/ (const Vector<T>& v, const T& c) {
+    friend Vector<T> operator/ (const Vector<T>& v, const T c) {
         size_t n = v.size();
         Vector<T> res(n);
         for (size_t i = 1; i <= n; i++) {
@@ -180,9 +180,10 @@ public:
         return res;
     }
     template<typename T2>
-    Vector<T>& operator/= (const T2& c) {
+    Vector<T>& operator/= (const T2 c) {
         //debugil(_n);
         for (size_t i = 1; i <= _n; i++) {
+            //debugil((*this)[i]);
             //debugil(c);
             (*this)[i] /= c;
         }

@@ -6,10 +6,12 @@
 #include "debug.h"
 #include "int.h"
 
-//Integer gcd(Integer a, Integer b) {
+#ifdef NATIVE
+Integer gcd(Integer a, Integer b) {
     //debugi << "a = " << a << ", b = " << b << std::endl;
-//    return b == Integer(0) ? a : ::gcd(b, a % b);
-//}
+    return b == Integer(0) ? a : ::gcd(b, a % b);
+}
+#endif
 
 class Num { // rational Num
 private:

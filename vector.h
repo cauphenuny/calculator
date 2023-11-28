@@ -147,7 +147,7 @@ public:
         return *this;
     }
 
-    friend Vector<T> operator* (const Vector<T>& v, const T& c) {
+    friend Vector<T> operator* (const Vector<T>& v, const T c) {
         size_t n = v.size();
         Vector<T> res(n);
         for (size_t i = 1; i <= n; i++) {

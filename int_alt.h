@@ -14,7 +14,7 @@ const int MOD = 1e9 + 7;
 const ld PI = acos(-1.L);
 
 template <class T> struct cplx {
-    T x, y;
+    T x{0}, y{0};
     cplx() {
         x = 0.0;
         y = 0.0;
@@ -91,8 +91,9 @@ struct BigInt {
         swap(*this, other);
         return *this;
     }
-    BigInt(BigInt &&other) : BigInt() {
-        swap(*this, other);
+    BigInt(BigInt &&other) {
+        sgn = other.sgn;
+        a = std::move(other.a);
     }
     BigInt(const string &s) {
         read(s);

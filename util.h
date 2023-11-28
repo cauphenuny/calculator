@@ -10,23 +10,19 @@ class MemoryPool {
         return _siz;
     }
     size_t reset(size_t new_n = 1) {
-        if (_data != nullptr) {
-            delete[] _data;
-        }
+        delete[] _data;
         _cap = new_n * _min;
         _data = new T[_cap];
         return _cap;
     }
     size_t resize(size_t new_n) {
-        if (_data != nullptr) {
-            if ((size_t)(new_n * _min) > _cap || 
-                (size_t)(new_n * _max) < _cap) {
-                T* new_data = new T[(size_t)(new_n * _min)];
-                memcpy(new_data, _data, sizeof(T) * _cap);
-                _cap = (size_t)new_n * _min;
-                _data = new_data;
-                delete[] new_data;
-            }
+        if ((size_t)(new_n * _min) > _cap || 
+            (size_t)(new_n * _max) < _cap) {
+            T* new_data = new T[(size_t)(new_n * _min)];
+            memcpy(new_data, _data, sizeof(T) * _cap);
+            _cap = (size_t)new_n * _min;
+            _data = new_data;
+            delete[] new_data;
         }
         return _cap;
     }

@@ -10,6 +10,7 @@ class Integer {
     int _sgn;
     MemoryPool<int> _data;
 public:
+    Integer();
     Integer(long long);
     Integer(const std::string&);
     Integer(const Integer&);
@@ -31,8 +32,6 @@ public:
 
     Integer operator-();
     Integer operator+();
-
-    friend 
 
     friend std::istream &operator>>(std::istream &, Integer&);
     friend std::ostream &operator<<(std::ostream &, const Integer&);

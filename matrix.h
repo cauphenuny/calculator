@@ -92,7 +92,6 @@ public:
         }
     }
 
-    T det() const;
     size_t rank() const;
 
     Matrix<T> eliminate() {
@@ -116,26 +115,28 @@ public:
             }
             if (row != targ) mat.swap(row, targ);
             //debug << "----before div " << mat[row][col] << "--------\n" << mat;
-            mat.div(row, mat[row][col]);
             //debug << "----after div row " << row << " -----\n" << mat;
             for (size_t nrow = row + 1; nrow <= _n; nrow++) { // next row
                 if (mat[nrow][col] != T(0)) {
                     //debug << "nrow " << nrow << "k = " << -mat[nrow][col] << std::endl;
-                    mat.add(nrow, row, -mat[nrow][col]);
+                    mat.add(nrow, row, -mat[nrow][col] / mat[row][col]);
                 }
             }
-            //debug << "----after clearing column" << col << " -----\n" << mat;
+            debug << "----after clearing column" << col << " -----\n" << mat;
             row++, col++;
         }
         return mat;
     }
-    T det() {
+    T det() const {
         size_t _n = this->_n;
         assert(_n == _m);
-        Matrix<T> mat(eliminate());
+        Matrix<T> mat(*this);
+        mat.eliminate();
         T res = 1;
         for (size_t i = 1; i <= _n; i++) {
+            res *= mat[i][i];
         }
+        return res;
     }
     size_t rank() {
         size_t _n = this->_n;
@@ -164,14 +165,16 @@ public:
         mat.eliminate();
         debugi << "eliminated\n";
         for (size_t i = mat._n; i > 1; i--) {
+            mat.div(i, mat[i][i]);
             for (size_t j = i - 1; j >= 1; j--) {
                 if (mat[j][i] != 0) {
-                    add(j, i, -mat[j][i]);
+                    mat.add(j, i, -mat[j][i]);
                     //debug << mat;
                 }
             }
         }
-        debugi << "identified\n" << mat;
+        mat.div(1, mat[1][1]);
+        debugi << "identified\n";
         return mat;
     }
     Matrix<T> inverse() {
@@ -258,7 +261,7 @@ public:
         Matrix<T> mat(row, col);
         for (int i = 1; i <= row; i++) {
             for (int j = 1; j <= col; j++) {
-                mat[i][j] = T(randint(-1000, 1000));
+                mat[i][j] = T(randint(-10000, 10000));
             }
         }
         return mat;

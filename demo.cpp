@@ -1,3 +1,4 @@
+//#include "poly.h"
 #include <iostream>
 #include <vector>
 #include "calculator.h"
@@ -22,26 +23,21 @@ int main() {
     //std::cout << m + n;
     //char c;
     //std::cin >> c;
-    debugl(sizeof(Num));
-    debugl(sizeof(Vector<Num>));
-    debugl(sizeof(Matrix<Num>));
-    debugl(sizeof(std::vector<int>));
-    debugl(sizeof(MemoryPool<int>));
-    debugl(sizeof(Integer));
-    //Matrix<double> m(4, 4);
-    //cin >> m;
-    //cout << m;
-    //cout << m * m;
-    //Integer a(), b(3);
-    //cout << a % b << endl;
-    //return 0;
-    auto rnd1 = Matrix<Num>::rand(3, 3);
-    auto res = rnd1;
-    rnd1 /= randint(10, 20);
+    using T = Num;
+    Matrix<T> mat1 = {{3, 3,-4, 3},
+                      {0, 6, 1, 1},
+                      {5, 4, 2, 1},
+                      {2, 3, 3, 2}};
+    mat1.inverse();
+    cout << mat1 << endl;
+    auto rnd1 = Matrix<T>::rand(5, 5);
+    auto rnd2 = Matrix<T>::rand(5, 5);
     cout << rnd1;
+    auto rst = rnd1;
     rnd1.inverse();
-    cout << rnd1;
-    cout << rnd1 * res;
+    rnd1.inverse();
+    assert(rnd1 == rst);
+    //auto rst = rnd1 * rnd2;
     return 0;
 }
 

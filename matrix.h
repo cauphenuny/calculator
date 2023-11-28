@@ -34,6 +34,10 @@ public:
         _m(mat._m) {
         //debugi << "copy constructor called";
     }
+    Matrix(std::initializer_list<rowVector<T>> content) :
+        Vector<rowVector<T>>(content),
+        _m(content.begin()->size()) {
+    }
     Matrix<T>& operator= (const Matrix<T>& mat) {
         if (this != &mat) {
             Vector<rowVector<T>>::operator=(mat);
@@ -257,11 +261,17 @@ public:
         }
         return mat;
     }
-    static Matrix<T> rand(int row, int col) {
+    static Matrix<T> rand(int row, int col, std::initializer_list<int> range = {-10, 10}) {
         Matrix<T> mat(row, col);
+        int minv = *(range.begin());
+        int maxv = *(std::next(range.begin()));
+        int div = 0;
+        do {
+            div = randint(minv, maxv);
+        } while (div == 0);
         for (int i = 1; i <= row; i++) {
             for (int j = 1; j <= col; j++) {
-                mat[i][j] = T(randint(-10000, 10000));
+                mat[i][j] = T(randint(minv, maxv)) / div;
             }
         }
         return mat;

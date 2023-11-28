@@ -47,6 +47,14 @@ public:
         v._data = nullptr;
         //debugi << "#4 done (copy)\n";
     }
+    Vector(std::initializer_list<T> content) {
+        _n = content.size();
+        _data = new T[_n];
+        auto it = content.begin();
+        for (size_t i = 0; i < _n; i++, it++) {
+            _data[i] = T(*(it));
+        }
+    }
     ~Vector() {
         if (_data != nullptr) {
             //debugi << "free memory\n";

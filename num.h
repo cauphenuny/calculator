@@ -6,10 +6,10 @@
 #include "debug.h"
 #include "int.h"
 
-#ifdef NATIVE
+#ifndef ALT1
 Integer gcd(Integer a, Integer b) {
     //debugi << "a = " << a << ", b = " << b << std::endl;
-    return b == Integer(0) ? a : ::gcd(b, a % b);
+    return b == Integer(0) ? a : gcd(b, a % b);
 }
 #endif
 

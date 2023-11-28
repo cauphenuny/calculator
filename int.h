@@ -38,14 +38,21 @@ public:
 };
 
 #else
-#ifdef NATIVE
-
-using Integer = long long;
-
-#else
+#ifdef ALT1
 
 #include "int_alt.h"
 using Integer = legendstane::BigInt;
 
-#endif
-#endif // ifdef DEV
+#else
+#ifdef ALT2
+
+#include "int_alt2.h"
+using Integer = BigIntDec;
+
+#else
+
+using Integer = long long;
+
+#endif // ALT2
+#endif // ALT1
+#endif // DEV

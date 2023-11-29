@@ -126,7 +126,7 @@ public:
                     mat.add(nrow, row, -mat[nrow][col] / mat[row][col]);
                 }
             }
-            debug << "----after clearing column" << col << " -----\n" << mat;
+            //debug << "----after clearing column" << col << " -----\n" << mat;
             row++, col++;
         }
         return mat;
@@ -167,7 +167,7 @@ public:
         Matrix<T>& mat = *this;
         assert(mat._n == mat._m);
         mat.eliminate();
-        debugi << "eliminated\n";
+        //debugi << "eliminated\n";
         for (size_t i = mat._n; i > 1; i--) {
             mat.div(i, mat[i][i]);
             for (size_t j = i - 1; j >= 1; j--) {
@@ -178,18 +178,18 @@ public:
             }
         }
         mat.div(1, mat[1][1]);
-        debugi << "identified\n";
+        //debugi << "identified\n";
         return mat;
     }
     Matrix<T> inverse() {
         Matrix<T> tmp(*this);
-        debugi << "copied\n";
+        //debugi << "copied\n";
         *this = Matrix<T>::id(this->_n);
-        debugi << "reseted\n";
+        //debugi << "reseted\n";
         tmp.bind(*this);
-        debugi << "linked\n";
+        //debugi << "linked\n";
         tmp.identify();
-        debugi << "calculated\n";
+        //debugi << "calculated\n";
         return *this;
     }
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstring>
 #include "debug.h"
 
 #define _min 1.3
@@ -38,7 +39,7 @@ public:
         return _data[index];
     }
     Dynarray& operator= (const Dynarray& d) {
-        //debugi << "#1\n";
+        debugi << "copy\n";
         delete[] _data;
         _siz = d._siz;
         _cap = d._cap;
@@ -50,7 +51,7 @@ public:
         return *this;
     }
     Dynarray& operator= (Dynarray&& d) {
-        //debugi << "#2\n";
+        debugi << "move\n";
         delete[] _data;
         _siz = d._siz;
         _cap = d._cap;
@@ -64,11 +65,9 @@ public:
         _cap = siz * _min;
         _data = new T[_cap];
     }
-    Dynarray(const Dynarray& p) {
-        (*this) = p;
-    }
-    Dynarray(Dynarray&& p) {
-        (*this) = p;
+    template<typename T2>
+    Dynarray(T2&& p) {
+        (*this) = std::forward<T2>(p);
     }
     ~Dynarray() {
         delete[] _data;

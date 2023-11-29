@@ -6,7 +6,7 @@
 static std::mt19937 rnd((std::random_device())());
 
 template<typename T>
-static T randint(T l, T r) {
+T randint(T l, T r) {
     std::uniform_int_distribution<T> distrib(l, r);
     return distrib(rnd);
 }

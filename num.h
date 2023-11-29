@@ -7,7 +7,7 @@
 #include "int.h"
 
 #ifndef ALT1
-static Integer gcd(Integer a, Integer b) {
+inline Integer gcd(Integer a, Integer b) {
     //debugi << "a = " << a << ", b = " << b << std::endl;
     return b == Integer(0) ? a : gcd(b, a % b);
 }

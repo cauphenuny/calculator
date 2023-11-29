@@ -7,7 +7,7 @@
 #include "int.h"
 
 #ifndef ALT1
-Integer gcd(Integer a, Integer b) {
+static Integer gcd(Integer a, Integer b) {
     //debugi << "a = " << a << ", b = " << b << std::endl;
     return b == Integer(0) ? a : gcd(b, a % b);
 }
@@ -170,28 +170,25 @@ public:
     bool operator!= (const Num& val) const {
         return (down != val.down) || (up != val.up);
     }
-
-};
-
-std::istream& operator>> (std::istream &is, Num& n) {
-    std::string str;
-    is >> str;
-    //debugi << std::endl;
-    n = Num(str);
-    return is;
-}
-
-std::ostream& operator<< (std::ostream &os, const Num& n) {
-    auto &up = n.up, &down = n.down;
-    if (down == 1) { 
-        os << "{" << up << "}"; 
-    } else {
-        if (up > 0) {
-            os << "\\frac{" << up << "}{" << down << "}";
-        } else {
-            os << "{-\\frac{" << -up << "}{" << down << "}}";
-        }
+    friend std::istream& operator>> (std::istream &is, Num& n) {
+        std::string str;
+        is >> str;
+        //debugi << std::endl;
+        n = Num(str);
+        return is;
     }
-    return os;
-}
+    friend std::ostream& operator<< (std::ostream &os, const Num& n) {
+        auto &up = n.up, &down = n.down;
+        if (down == 1) { 
+            os << "{" << up << "}"; 
+        } else {
+            if (up > 0) {
+                os << "\\frac{" << up << "}{" << down << "}";
+            } else {
+                os << "{-\\frac{" << -up << "}{" << down << "}}";
+            }
+        }
+        return os;
+    }
+};
 

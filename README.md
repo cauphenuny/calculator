@@ -1,18 +1,16 @@
 # calculator
 
-计划实现一些科学计算，支持 LaTeX 输出。
+plan to implement some scientific calculation, supporting LaTeX output.
 
-- [x] 自适应精度
+- [x] 
 
-- [x] 有理数
+- [x] rational num
 
-- [x] 向量
+- [x] vector
 
-- [x] 矩阵
+- [x] matrix
 
-- [x] 整系数多项式
-
-- [ ] 多变量多项式
+- [x] poly (with integer cofficient)
 
 ## demo
 
@@ -30,10 +28,8 @@ int main() {
 }
 ```
 
-using `long long` as default;
+recommanded to use the GMP library. (compile option: `-DGMP $(pkg-config --cflags --libs gmp)`)
 
-for others, add `-DALT1` or `-DALT2` to your complination command.
-
-e.g. `g++ demo.cpp -o demo -DALT1`
+for others, use `-DALT1` or `-DALT2` to your complination option.
 
 see: [int.h](int.h)

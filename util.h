@@ -40,24 +40,28 @@ public:
     }
     Dynarray& operator= (const Dynarray& d) {
         debugi << "copy\n";
-        delete[] _data;
-        _siz = d._siz;
-        _cap = d._cap;
-        //debugi << "capacity: " << _cap << "\n";
-        _data = new T[_cap];
-        //debugi << "copy " << sizeof(T) * _siz << "\n";
-        memcpy(_data, d._data, sizeof(T) * _siz);
-        //debugi << "done\n";
+        if (d._data != this->_data) {
+            delete[] _data;
+            _siz = d._siz;
+            _cap = d._cap;
+            //debugi << "capacity: " << _cap << "\n";
+            _data = new T[_cap];
+            //debugi << "copy " << sizeof(T) * _siz << "\n";
+            memcpy(_data, d._data, sizeof(T) * _siz);
+            //debugi << "done\n";
+        }
         return *this;
     }
     Dynarray& operator= (Dynarray&& d) {
         debugi << "move\n";
-        delete[] _data;
-        _siz = d._siz;
-        _cap = d._cap;
-        _data = d._data;
-        d._data = nullptr;
-        //debugi << "done\n";
+        if (d._data != this->_data) {
+            delete[] _data;
+            _siz = d._siz;
+            _cap = d._cap;
+            _data = d._data;
+            d._data = nullptr;
+            //debugi << "done\n";
+        }
         return *this;
     }
     Dynarray(size_t siz = 0) {

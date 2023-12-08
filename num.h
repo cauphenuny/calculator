@@ -46,7 +46,7 @@ public:
         return up > 0;
     }
 
-    Num(long long val = 0): up(val), down(1) {}
+    Num(int val = 0): up(val), down(1) {}
     Num(const Integer& numerator, const Integer& denominator):
         up(numerator),
         down(denominator)
@@ -178,14 +178,13 @@ public:
         return is;
     }
     friend std::ostream& operator<< (std::ostream &os, const Num& n) {
-        auto &up = n.up, &down = n.down;
-        if (down == 1) { 
-            os << "{" << up << "}"; 
+        if (n.down == 1) { 
+            os << "{" << n.up << "}"; 
         } else {
-            if (up > 0) {
-                os << "\\frac{" << up << "}{" << down << "}";
+            if (n.up > 0) {
+                os << "\\frac{" << n.up << "}{" << n.down << "}";
             } else {
-                os << "{-\\frac{" << -up << "}{" << down << "}}";
+                os << "{-\\frac{" << -n.up << "}{" << n.down << "}}";
             }
         }
         return os;

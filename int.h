@@ -38,6 +38,13 @@ public:
 };
 
 #else
+#ifdef GMP
+
+#include <gmpxx.h>
+
+using Integer = mpz_class;
+
+#else
 #ifdef ALT1
 
 #include "int_alt.h"
@@ -55,4 +62,5 @@ using Integer = long long;
 
 #endif // ALT2
 #endif // ALT1
+#endif
 #endif // DEV

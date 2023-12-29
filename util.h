@@ -79,3 +79,9 @@ public:
 };
 #undef _min
 #undef _max
+
+class printable {
+public:
+    virtual friend std::istream& operator>> (std::istream &, Num&) = 0;
+    virtual friend std::ostream& operator<< (std::ostream &, const Num&) = 0;
+}

@@ -5,7 +5,7 @@
 #include <iostream>
 #include <iomanip>
 
-namespace legendstane {
+namespace int_alt1 {
 using namespace std;
 typedef long long ll;
 typedef long double ld;

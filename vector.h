@@ -5,47 +5,48 @@
 #include <vector>
 #include <string>
 #include <cassert>
+#include "util.h"
 
-template<typename T>
-class Vector {
-protected:
-    T* _data;
+template <typename T> class Vector {
+  protected:
+    T *_data;
     size_t _n;
 
-public:
-    Vector(): _data(nullptr) {}
+  public:
+    Vector() : _data(nullptr) {
+    }
     Vector(size_t n) {
-        //debugi << "#1 start n = " << n << "\n";
+        // debugi << "#1 start n = " << n << "\n";
         _n = n;
         _data = new T[n];
-        //debugi << "#1 done n = " << n << "\n";
+        // debugi << "#1 done n = " << n << "\n";
     }
     Vector(size_t n, const T t) {
-        //debugi << "#2 start n = " << n << "\n";
+        // debugi << "#2 start n = " << n << "\n";
         _n = n;
         _data = new T[_n];
         for (size_t i = 0; i < _n; i++) {
             _data[i] = T(t);
         }
-        //debugi << "#2 done n = " << n << "\n";
+        // debugi << "#2 done n = " << n << "\n";
         for (size_t i = 0; i < _n; i++) {
-            //debug << _data[i] << "\n";
+            // debug << _data[i] << "\n";
         }
-        //debug << "\n";
+        // debug << "\n";
     }
-    Vector(const Vector<T>& v) {
+    Vector(const Vector<T> &v) {
         _n = v._n;
         _data = new T[_n];
         for (size_t i = 0; i < _n; i++) {
             _data[i] = T(v._data[i]);
         }
-        //debugi << "#3 done (deep copy)\n";
+        // debugi << "#3 done (deep copy)\n";
     }
-    Vector(Vector<T>&& v) {
+    Vector(Vector<T> &&v) {
         _n = v._n;
         _data = v._data;
         v._data = nullptr;
-        //debugi << "#4 done (copy)\n";
+        // debugi << "#4 done (copy)\n";
     }
     Vector(std::initializer_list<T> content) {
         _n = content.size();
@@ -57,15 +58,19 @@ public:
     }
     ~Vector() {
         if (_data != nullptr) {
-            //debugi << "free memory\n";
+            // debugi << "free memory\n";
             delete[] _data;
         }
     }
 
-    T& operator[] (size_t c) { return _data[c - 1]; }
-    const T& operator[] (size_t c) const { return _data[c - 1]; }
-    Vector<T>& operator= (const Vector<T>& v) {
-        //debugi << "deep copy\n";
+    T &operator[](size_t c) {
+        return _data[c - 1];
+    }
+    const T &operator[](size_t c) const {
+        return _data[c - 1];
+    }
+    Vector<T> &operator=(const Vector<T> &v) {
+        // debugi << "deep copy\n";
         if (this != &v) {
             if (v._n > _n) {
                 if (_data != nullptr) delete[] _data;
@@ -78,8 +83,8 @@ public:
         }
         return *this;
     }
-    Vector<T>& operator= (Vector<T>&& v) {
-        //debugi << "copy\n";
+    Vector<T> &operator=(Vector<T> &&v) {
+        // debugi << "copy\n";
         if (this != &v) {
             if (_data != nullptr) delete[] _data;
             _data = v._data;
@@ -88,40 +93,42 @@ public:
         }
         return *this;
     }
-    bool operator== (const Vector<T>& v) const {
+    bool operator==(const Vector<T> &v) const {
         for (size_t i = 1; i <= v.size(); i++) {
             if ((*this)[i] != v[i]) {
-                //debugl((*this)[i]);
-                //debugl(v[i]);
+                // debugl((*this)[i]);
+                // debugl(v[i]);
                 return 0;
             }
         }
         return 1;
     }
-    bool operator!= (const Vector<T>& v) const {
-        //debugi << std::endl;
+    bool operator!=(const Vector<T> &v) const {
+        // debugi << std::endl;
         return !(this->operator==(v));
     }
 
-    size_t size() const { return _n; }
-    friend std::istream& operator>> (std::istream& is, Vector<T>& vec) {
-        //debugi << std::endl;
+    size_t size() const {
+        return _n;
+    }
+    friend std::istream &operator>>(std::istream &is, Vector<T> &vec) {
+        // debugi << std::endl;
         for (size_t i = 1; i <= vec.size(); i++) {
             is >> vec[i];
         }
         return is;
     }
 
-    friend void swap(Vector<T>& v1, Vector<T>& v2) {
+    friend void swap(Vector<T> &v1, Vector<T> &v2) {
         std::swap(v1._data, v2._data);
         std::swap(v1._n, v2._n);
     }
-    void swap(Vector<T>& v2) {
+    void swap(Vector<T> &v2) {
         std::swap(this->_data, v2._data);
         std::swap(this->_n, v2._n);
     }
 
-    friend Vector<T> operator+ (const Vector<T>& v1, const Vector<T>& v2) {
+    friend Vector<T> operator+(const Vector<T> &v1, const Vector<T> &v2) {
         assert(v1.size() == v2.size());
         size_t n = v1.size();
         Vector<T> res(n);
@@ -130,7 +137,7 @@ public:
         }
         return res;
     }
-    Vector<T>& operator+= (const Vector<T>& v2) {
+    Vector<T> &operator+=(const Vector<T> &v2) {
         assert(_n == v2._n);
         for (size_t i = 1; i <= _n; i++) {
             (*this)[i] += v2[i];
@@ -138,7 +145,7 @@ public:
         return *this;
     }
 
-    friend Vector<T> operator- (const Vector<T>& v1, const Vector<T>& v2) {
+    friend Vector<T> operator-(const Vector<T> &v1, const Vector<T> &v2) {
         assert(v1.size() == v2.size());
         size_t n = v1.size();
         Vector<T> res(n);
@@ -147,7 +154,7 @@ public:
         }
         return res;
     }
-    Vector<T>& operator-= (const Vector<T>& v2) {
+    Vector<T> &operator-=(const Vector<T> &v2) {
         assert(_n == v2._n);
         for (size_t i = 1; i <= _n; i++) {
             (*this)[i] -= v2[i];
@@ -155,7 +162,7 @@ public:
         return *this;
     }
 
-    friend Vector<T> operator* (const Vector<T>& v, const T c) {
+    friend Vector<T> operator*(const Vector<T> &v, const T c) {
         size_t n = v.size();
         Vector<T> res(n);
         for (size_t i = 1; i <= n; i++) {
@@ -163,14 +170,13 @@ public:
         }
         return res;
     }
-    template<typename T2>
-    Vector<T>& operator*= (const T2 c) {
+    template <typename T2> Vector<T> &operator*=(const T2 c) {
         for (size_t i = 1; i <= _n; i++) {
             (*this)[i] *= c;
         }
         return *this;
     }
-    friend Vector<T> operator* (const T c, const Vector<T>& v) {
+    friend Vector<T> operator*(const T c, const Vector<T> &v) {
         size_t n = v.size();
         Vector<T> res(n);
         for (size_t i = 1; i <= n; i++) {
@@ -179,7 +185,7 @@ public:
         return res;
     }
 
-    friend Vector<T> operator/ (const Vector<T>& v, const T c) {
+    friend Vector<T> operator/(const Vector<T> &v, const T c) {
         size_t n = v.size();
         Vector<T> res(n);
         for (size_t i = 1; i <= n; i++) {
@@ -187,22 +193,20 @@ public:
         }
         return res;
     }
-    template<typename T2>
-    Vector<T>& operator/= (const T2 c) {
-        //debugil(_n);
+    template <typename T2> Vector<T> &operator/=(const T2 c) {
+        // debugil(_n);
         for (size_t i = 1; i <= _n; i++) {
-            //debugil((*this)[i]);
-            //debugil(c);
+            // debugil((*this)[i]);
+            // debugil(c);
             (*this)[i] /= c;
         }
         return *this;
     }
 };
 
-template<typename T>
-class colVector : public Vector<T> {
+template <typename T> class colVector : public Vector<T>, printable {
     using Vector<T>::Vector;
-    friend std::ostream& operator<< (std::ostream &os, const colVector<T>& vec) {
+    friend std::ostream &operator<<(std::ostream &os, const colVector<T> &vec) {
         os << "\\left(\\begin{array}{c}";
         auto n = vec.size();
         if (n) {
@@ -216,10 +220,9 @@ class colVector : public Vector<T> {
     }
 };
 
-template<typename T>
-class rowVector : public Vector<T> {
+template <typename T> class rowVector : public Vector<T>, printable {
     using Vector<T>::Vector;
-    friend std::ostream& operator<< (std::ostream &os, const rowVector<T>& vec) {
+    friend std::ostream &operator<<(std::ostream &os, const rowVector<T> &vec) {
         os << "\\left(\\begin{array}{c}";
         auto n = vec.size();
         if (n) {

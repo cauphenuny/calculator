@@ -1,14 +1,22 @@
 #pragma once
 
+#ifdef GMP
+
+#include <gmpxx.h>
+
+using Integer = mpz_class;
+
+#else
+#warning "using other implements of integer may cause some problems!"
 #ifdef DEV
 
 #include "util.h"
 #include <iostream>
 #include <string>
 
-class Integer {
+class Integer: public printable {
     int _sgn;
-    MemoryPool<int> _data;
+    Dynarray<int> _data;
 public:
     Integer();
     Integer(long long);
@@ -30,31 +38,28 @@ public:
     friend Integer operator/(const Integer&, const Integer&);
     friend Integer operator%(const Integer&, const Integer&);
 
-    Integer operator-();
-    Integer operator+();
+    Integer operator-() const;
+    Integer operator+() const;
 
-    friend std::istream &operator>>(std::istream &, Integer&);
-    friend std::ostream &operator<<(std::ostream &, const Integer&);
+    bool operator==(const Integer&) const;
+    bool operator!=(const Integer&) const;
+    bool operator<(const Integer&) const;
+    bool operator>(const Integer&) const;
+    bool operator>=(const Integer&) const;
+    bool operator<=(const Integer&) const;
 };
-
-#else
-#ifdef GMP
-
-#include <gmpxx.h>
-
-using Integer = mpz_class;
 
 #else
 #ifdef ALT1
 
 #include "int_alt.h"
-using Integer = legendstane::BigInt;
+using Integer = int_alt1::BigInt;
 
 #else
 #ifdef ALT2
 
 #include "int_alt2.h"
-using Integer = BigIntDec;
+using Integer = int_alt2::BigIntDec;
 
 #else
 
@@ -62,5 +67,5 @@ using Integer = long long;
 
 #endif // ALT2
 #endif // ALT1
-#endif
 #endif // DEV
+#endif // GMP

@@ -1,5 +1,4 @@
-#ifndef POLY_H
-#define POLY_H
+#pragma once
 #include <utility>
 #include <cstring>
 #include <cstdio>
@@ -245,4 +244,3 @@ inline void fill(poly_t &dest, const poly_t &src, int len) {
 }
 
 } // namespace poly
-#endif

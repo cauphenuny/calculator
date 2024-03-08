@@ -82,6 +82,8 @@ public:
 
 class printable {
 public:
-    virtual friend std::istream& operator>> (std::istream &, Num&) = 0;
-    virtual friend std::ostream& operator<< (std::ostream &, const Num&) = 0;
+    template<typename T>
+    virtual friend std::istream& operator>> (std::istream &, T&) = 0;
+    template<typename T>
+    virtual friend std::ostream& operator<< (std::ostream &, const T&) = 0;
 }

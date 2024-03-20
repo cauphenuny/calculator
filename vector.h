@@ -204,7 +204,7 @@ template <typename T> class Vector {
     }
 };
 
-template <typename T> class colVector : public Vector<T>, printable {
+template <typename T> class colVector : public Vector<T> {
     using Vector<T>::Vector;
     friend std::ostream &operator<<(std::ostream &os, const colVector<T> &vec) {
         os << "\\left(\\begin{array}{c}";
@@ -220,7 +220,7 @@ template <typename T> class colVector : public Vector<T>, printable {
     }
 };
 
-template <typename T> class rowVector : public Vector<T>, printable {
+template <typename T> class rowVector : public Vector<T> {
     using Vector<T>::Vector;
     friend std::ostream &operator<<(std::ostream &os, const rowVector<T> &vec) {
         os << "\\left(\\begin{array}{c}";

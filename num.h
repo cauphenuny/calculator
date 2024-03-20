@@ -14,7 +14,7 @@ inline Integer gcd(Integer a, Integer b) {
 }
 #endif
 
-class Num : public printable { // rational Num
+class Num { // rational Num
   private:
     Integer up;   // numerator
     Integer down; // denominator

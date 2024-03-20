@@ -12,7 +12,7 @@
 #include "rand.h"
 #include "util.h"
 
-template <typename T> class Matrix : public Vector<Vector<T>>, printable {
+template <typename T> class Matrix : public Vector<Vector<T>> {
   protected:
     size_t _m;
     Matrix<T> *_bind{nullptr};

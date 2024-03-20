@@ -79,11 +79,3 @@ public:
 };
 #undef _min
 #undef _max
-
-class printable {
-public:
-    template<typename T>
-    virtual friend std::istream& operator>> (std::istream &, T&) = 0;
-    template<typename T>
-    virtual friend std::ostream& operator<< (std::ostream &, const T&) = 0;
-}

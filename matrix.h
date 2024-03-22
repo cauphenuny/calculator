@@ -27,27 +27,27 @@ template <typename T> class Matrix : public Vector<Vector<T>> {
         // debuginfo;
     }
     Matrix(const Matrix<T> &mat) : Vector<Vector<T>>(mat), _m(mat._m) {
-        // debuginfo;
+        // debugi << "copy constructor called";
     }
     Matrix(Matrix<T> &&mat) : Vector<Vector<T>>(mat), _m(mat._m) {
-        // debugi << "copy constructor called";
+        // debugi << "move constructor called";
     }
     Matrix(std::initializer_list<Vector<T>> content)
         : Vector<Vector<T>>(content), _m(content.begin()->size()) {
     }
     Matrix<T> &operator=(const Matrix<T> &mat) {
         if (this != &mat) {
-            Vector<Vector<T>>::operator=(mat);
             _m = mat._m;
             _bind = mat._bind;
+            Vector<Vector<T>>::operator=(mat);
         }
         return *this;
     }
     Matrix<T> &operator=(Matrix<T> &&mat) {
         if (this != &mat) {
-            Vector<Vector<T>>::operator=(mat);
             _m = mat._m;
             _bind = mat._bind;
+            Vector<Vector<T>>::operator=(mat);
         }
         return *this;
     }
@@ -105,17 +105,17 @@ template <typename T> class Matrix : public Vector<Vector<T>> {
         }
     }
 
-    size_t rank() const;
+    size_t rank();
 
     Matrix<T> eliminate() {
         Matrix<T> &mat = *this;
         size_t col = 1, row = 1;
-        size_t _n = mat._n;
+        size_t n = mat._n, m = mat._m;
         // debug << mat;
-        while (row <= _n && col <= _m) {
+        while (row <= n && col <= m) {
             // debugil(row), debugil(col);
             size_t targ = 0;                              // target row
-            for (size_t cand = row; cand <= _n; cand++) { // candidate row
+            for (size_t cand = row; cand <= n; cand++) { // candidate row
                 if (mat[cand][col] != T(0)) {
                     targ = cand;
                     break;
@@ -129,7 +129,7 @@ template <typename T> class Matrix : public Vector<Vector<T>> {
             if (row != targ) mat.swap(row, targ);
             // debug << "----before div " << mat[row, col] << "--------\n" <<
             // mat; debug << "----after div row " << row << " -----\n" << mat;
-            for (size_t nrow = row + 1; nrow <= _n; nrow++) { // next row
+            for (size_t nrow = row + 1; nrow <= n; nrow++) { // next row
                 if (mat[nrow][col] != T(0)) {
                     // debug << "nrow " << nrow << "k = " << -mat[nrow, col] <<
                     // std::endl;
@@ -152,7 +152,7 @@ template <typename T> class Matrix : public Vector<Vector<T>> {
         }
         return res;
     }
-    size_t rank() {
+    size_t rank() const {
         size_t _n = this->_n;
         Matrix<T> mat(eliminate());
         size_t r = 0, p = 0;
@@ -191,16 +191,17 @@ template <typename T> class Matrix : public Vector<Vector<T>> {
         // debugi << "identified\n";
         return mat;
     }
-    Matrix<T> inverse() {
+
+    Matrix<T> inverse() const {
         Matrix<T> tmp(*this);
         // debugi << "copied\n";
-        *this = Matrix<T>::id(this->_n);
+        Matrix<T> ans = id(rsize());
         // debugi << "reseted\n";
-        tmp.bind(*this);
+        tmp.bind(ans);
         // debugi << "linked\n";
         tmp.identify();
         // debugi << "calculated\n";
-        return *this;
+        return ans;
     }
 
     size_t rsize() const {
@@ -216,8 +217,8 @@ template <typename T> class Matrix : public Vector<Vector<T>> {
         std::swap(mat1._data, mat2._data);
     }
 
-    // using Vector<Vector<T>>::operator==;
-    // using Vector<Vector<T>>::operator!=;
+    using Vector<Vector<T>>::operator==;
+    using Vector<Vector<T>>::operator!=;
 
     using Vector<Vector<T>>::operator+=;
     friend Matrix<T> operator+(const Matrix<T> &mat1, const Matrix<T> &mat2) {
@@ -242,6 +243,10 @@ template <typename T> class Matrix : public Vector<Vector<T>> {
             }
         }
         return res;
+    }
+    Matrix<T>& operator*=(const Matrix<T> &mat) {
+        (*this) = (*this) * mat;
+        return (*this);
     }
     using Vector<Vector<T>>::operator*=;
     Matrix<T> operator*(const T val) {
@@ -268,6 +273,37 @@ template <typename T> class Matrix : public Vector<Vector<T>> {
         return os;
     }
 
+    Matrix<T> operator^(int p) {
+        assert(rsize() == csize());
+        Matrix<T> base = (*this);
+        Matrix<T> ans = id(rsize());
+        if (p < 0) {
+            base = base.inverse();
+            p = -p;
+        }
+        while (p) {
+            if (p & 1) {
+                ans *= base;
+            }
+            base *= base;
+            p /= 2;
+        }
+        return ans;
+    }
+
+    Matrix<T> operator/(const Matrix<T> &mat) {
+        assert(mat.rsize() == mat.csize());
+        return (*this) * mat.inverse();
+    }
+
+    static Matrix<T> zero(int n) {
+        Matrix<T> mat(n, n);
+        for (int i = 1; i <= n; i++) {
+            mat[i][i] = T(0);
+        }
+        return mat;
+    }
+
     static Matrix<T> id(int n) {
         Matrix<T> mat(n, n);
         for (int i = 1; i <= n; i++) {
@@ -275,6 +311,19 @@ template <typename T> class Matrix : public Vector<Vector<T>> {
         }
         return mat;
     }
+
+    static Matrix<T> diag(std::initializer_list<T> array) {
+        size_t n = array.size(), i = 0;
+        Matrix<T> mat(n, n, 0);
+        auto it = array.begin();
+        while (it != array.end()) {
+            i++;
+            mat[i][i] = *it;
+            it = std::next(it);
+        }
+        return mat;
+    }
+
     static Matrix<T> rand(int row, int col,
                           std::initializer_list<int> range = {-10, 10}) {
         Matrix<T> mat(row, col);

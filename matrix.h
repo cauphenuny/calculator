@@ -18,39 +18,6 @@ template <typename T> class Matrix : public Vector<Vector<T>> {
     Matrix<T> *_bind{nullptr};
 
   public:
-    Matrix(size_t row, size_t col)
-        : Vector<Vector<T>>(row, Vector<T>(col)), _m(col) {
-        // debuginfo;
-    }
-    Matrix(size_t row, size_t col, T t)
-        : Vector<Vector<T>>(row, Vector<T>(col, t)), _m(col) {
-        // debuginfo;
-    }
-    Matrix(const Matrix<T> &mat) : Vector<Vector<T>>(mat), _m(mat._m) {
-        // debugi << "copy constructor called";
-    }
-    Matrix(Matrix<T> &&mat) : Vector<Vector<T>>(mat), _m(mat._m) {
-        // debugi << "move constructor called";
-    }
-    Matrix(std::initializer_list<Vector<T>> content)
-        : Vector<Vector<T>>(content), _m(content.begin()->size()) {
-    }
-    Matrix<T> &operator=(const Matrix<T> &mat) {
-        if (this != &mat) {
-            _m = mat._m;
-            _bind = mat._bind;
-            Vector<Vector<T>>::operator=(mat);
-        }
-        return *this;
-    }
-    Matrix<T> &operator=(Matrix<T> &&mat) {
-        if (this != &mat) {
-            _m = mat._m;
-            _bind = mat._bind;
-            Vector<Vector<T>>::operator=(mat);
-        }
-        return *this;
-    }
 
     using Vector<Vector<T>>::operator[];
 
@@ -68,6 +35,51 @@ template <typename T> class Matrix : public Vector<Vector<T>> {
     }
     T &operator()(size_t r, size_t c) {
         return (*this)[r][c];
+    }
+
+    Matrix(size_t row, size_t col)
+        : Vector<Vector<T>>(row, Vector<T>(col)), _m(col) {
+        // debuginfo;
+    }
+    Matrix(size_t row, size_t col, T t)
+        : Vector<Vector<T>>(row, Vector<T>(col, t)), _m(col) {
+        // debuginfo;
+    }
+    Matrix(const Matrix<T> &mat)
+        : Vector<Vector<T>>(mat), _m(mat._m) {
+        // debugi << "copy constructor called";
+    }
+    Matrix(Matrix<T> &&mat)
+        : Vector<Vector<T>>(mat), _m(mat._m) {
+        // debugi << "move constructor called";
+    }
+    Matrix(std::initializer_list<Vector<T>> content)
+        : Vector<Vector<T>>(content), _m(content.begin()->size()) {
+    }
+    Matrix(rowVector<T> vec)
+        : Vector<Vector<T>>(1, vec), _m(vec.size()) {
+    }
+    Matrix(colVector<T> vec)
+        : Vector<Vector<T>>(vec.size(), Vector<T>(1)), _m(1) {
+        for (int i = 1; i <= vec.size(); i++) {
+            (*this)[i][1] = vec[i];
+        }
+    }
+    Matrix<T> &operator=(const Matrix<T> &mat) {
+        if (this != &mat) {
+            _m = mat._m;
+            _bind = mat._bind;
+            Vector<Vector<T>>::operator=(mat);
+        }
+        return *this;
+    }
+    Matrix<T> &operator=(Matrix<T> &&mat) {
+        if (this != &mat) {
+            _m = mat._m;
+            _bind = mat._bind;
+            Vector<Vector<T>>::operator=(mat);
+        }
+        return *this;
     }
 
     void bind(Matrix<T> &mat) {
@@ -244,6 +256,12 @@ template <typename T> class Matrix : public Vector<Vector<T>> {
         }
         return res;
     }
+    friend Matrix<T> operator*(const Matrix<T> &mat, const colVector<T> &vec) {
+        return mat * Matrix<T>(vec);
+    }
+    friend Matrix<T> operator*(const rowVector<T> &vec, const Matrix<T> &mat) {
+        return Matrix<T>(vec) * mat;
+    }
     Matrix<T>& operator*=(const Matrix<T> &mat) {
         (*this) = (*this) * mat;
         return (*this);
@@ -313,13 +331,11 @@ template <typename T> class Matrix : public Vector<Vector<T>> {
     }
 
     static Matrix<T> diag(std::initializer_list<T> array) {
-        size_t n = array.size(), i = 0;
+        size_t n = array.size();
         Matrix<T> mat(n, n, 0);
         auto it = array.begin();
-        while (it != array.end()) {
-            i++;
+        for (size_t i = 1; i <= n; i++, it++) {
             mat[i][i] = *it;
-            it = std::next(it);
         }
         return mat;
     }

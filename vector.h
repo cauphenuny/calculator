@@ -57,10 +57,8 @@ template <typename T> class Vector {
         }
     }
     ~Vector() {
-        if (_data != nullptr) {
-            // debugi << "free memory\n";
-            delete[] _data;
-        }
+        // debugi << "free memory\n";
+        delete[] _data;
     }
 
     T &operator[](size_t c) {
@@ -73,7 +71,7 @@ template <typename T> class Vector {
         // debugi << "deep copy\n";
         if (this != &v) {
             if (v._n > _n) {
-                if (_data != nullptr) delete[] _data;
+                delete[] _data;
                 _data = new T[_n];
             }
             _n = v._n;
@@ -86,7 +84,7 @@ template <typename T> class Vector {
     Vector<T> &operator=(Vector<T> &&v) {
         // debugi << "copy\n";
         if (this != &v) {
-            if (_data != nullptr) delete[] _data;
+            delete[] _data;
             _data = v._data;
             _n = v._n;
             v._data = nullptr;

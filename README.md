@@ -2,7 +2,7 @@
 
 plan to implement some scientific calculation, supporting LaTeX output.
 
-- [x] bigint (partly by including library)
+- [x] bigint (partly by importing GMP library)
 
 - [x] rational num
 

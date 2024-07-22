@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstring>
+#include <concepts>
 #include "debug.h"
 
 #define _min 1.3
@@ -79,3 +80,19 @@ public:
 };
 #undef _min
 #undef _max
+
+#if __cplusplus < 202000
+#error "at least use c++20!"
+#endif
+
+template <typename T>
+concept addable = requires(T a, T b) { a += b; a + b; };
+
+template <typename T>
+concept printable = requires(std::ostream& os, T a) { os << a; };
+
+template <typename T, typename V> 
+concept divisible = requires(T a, V b) { a / b; a /= b; };
+
+template <typename T, typename V>
+concept multipliable = requires(T a, V b) { a * b; a *= b; };

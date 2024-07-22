@@ -81,6 +81,166 @@ template <typename T> class Matrix : public Vector<Vector<T>> {
         }
         return *this;
     }
+    size_t rsize() const {
+        return this->_n;
+    }
+    size_t csize() const {
+        return this->_m;
+    }
+
+    Matrix<T> transpos() {
+        size_t n = rsize(), m = csize();
+        Matrix<T> mat(m, n);
+        for (size_t i = 1; i <= n; i++) {
+            for (size_t j = 1; j <= m; j++) {
+                mat[j][i] = (*this)[i][j];
+            }
+        }
+        return mat;
+    }
+
+    using Vector<Vector<T>>::operator==;
+    using Vector<Vector<T>>::operator!=;
+
+    using Vector<Vector<T>>::operator+=;
+    friend Matrix<T> operator+(const Matrix<T> &mat1, const Matrix<T> &mat2) {
+        Matrix<T> res(mat1);
+        res += mat2;
+        return res;
+    }
+    using Vector<Vector<T>>::operator-=;
+    friend Matrix<T> operator-(const Matrix<T> &mat1, const Matrix<T> &mat2) {
+        Matrix<T> res(mat1);
+        res -= mat2;
+        return res;
+    }
+    friend Matrix<T> operator*(const Matrix<T> &mat1, const Matrix<T> &mat2) {
+        assert(mat1._m == mat2._n);
+        Matrix<T> res(mat1._n, mat2._m);
+        for (size_t k = 1; k <= mat1._m; k++) {
+            for (size_t i = 1; i <= mat1._n; i++) {
+                for (size_t j = 1; j <= mat2._m; j++) {
+                    res[i][j] += mat1[i][k] * mat2[k][j];
+                }
+            }
+        }
+        return res;
+    }
+    friend Matrix<T> operator*(const Matrix<T> &mat, const colVector<T> &vec) {
+        return mat * Matrix<T>(vec);
+    }
+    friend Matrix<T> operator*(const rowVector<T> &vec, const Matrix<T> &mat) {
+        return Matrix<T>(vec) * mat;
+    }
+    Matrix<T>& operator*=(const Matrix<T> &mat) {
+        (*this) = (*this) * mat;
+        return (*this);
+    }
+    using Vector<Vector<T>>::operator*=;
+    Matrix<T> operator*(const T val) {
+        Matrix<T> res(*this);
+        res *= val;
+        return res;
+    }
+    friend Matrix<T> operator*(const T val, const Matrix<T> &mat) {
+        Matrix<T> res(mat);
+        res *= val;
+        return res;
+    }
+
+    friend std::ostream &operator<<(std::ostream &os, const Matrix<T> &mat) 
+        requires printable<T>
+    {
+        os << "\\begin{pmatrix}\n";
+        auto n = mat.rsize(), m = mat.csize();
+        for (size_t i = 1; i <= n; i++) {
+            for (size_t j = 1; j < m; j++) {
+                os << mat[i][j] << "&";
+            }
+            os << mat[i][m] << "\\\\\n";
+        }
+        os << "\\end{pmatrix}\n";
+        return os;
+    }
+
+    Matrix<T> operator^(unsigned p) requires (!divisible<T, T>) {
+        assert(rsize() == csize());
+        Matrix<T> base = (*this);
+        Matrix<T> ans = id(rsize());
+        while (p) {
+            if (p & 1) {
+                ans *= base;
+            }
+            base *= base;
+            p /= 2;
+        }
+        return ans;
+    }
+    Matrix<T> operator^(int p) requires divisible<T, T> {
+        assert(rsize() == csize());
+        Matrix<T> base = (*this);
+        Matrix<T> ans = id(rsize());
+        if (p < 0) {
+            base = base.inverse();
+            p = -p;
+        }
+        while (p) {
+            if (p & 1) {
+                ans *= base;
+            }
+            base *= base;
+            p /= 2;
+        }
+        return ans;
+    }
+    friend void swap(Matrix<T> &mat1, Matrix<T> &mat2) {
+        std::swap(mat1._n, mat2._n);
+        std::swap(mat1._m, mat2._m);
+        std::swap(mat1._data, mat2._data);
+    }
+
+    static Matrix<T> zero(int n) {
+        Matrix<T> mat(n, n);
+        for (int i = 1; i <= n; i++) {
+            mat[i][i] = T(0);
+        }
+        return mat;
+    }
+
+    static Matrix<T> id(int n) {
+        Matrix<T> mat(n, n);
+        for (int i = 1; i <= n; i++) {
+            mat[i][i] = T(1);
+        }
+        return mat;
+    }
+
+    static Matrix<T> diag(std::initializer_list<T> array) {
+        size_t n = array.size();
+        Matrix<T> mat(n, n, 0);
+        auto it = array.begin();
+        for (size_t i = 1; i <= n; i++, it++) {
+            mat[i][i] = *it;
+        }
+        return mat;
+    }
+
+    static Matrix<T> rand(int row, int col,
+                          std::initializer_list<T> range = {-10, 10}) {
+        Matrix<T> mat(row, col);
+        int minv = *(range.begin());
+        int maxv = *(std::next(range.begin()));
+        int div = 0;
+        do {
+            div = randint(minv, maxv);
+        } while (div == 0);
+        for (int i = 1; i <= row; i++) {
+            for (int j = 1; j <= col; j++) {
+                mat[i][j] = T(randint(minv, maxv)) / div;
+            }
+        }
+        return mat;
+    }
 
     void bind(Matrix<T> &mat) {
         _bind = &mat;
@@ -94,7 +254,11 @@ template <typename T> class Matrix : public Vector<Vector<T>> {
             _bind->swap(row1, row2);
         }
     }
-    void add(size_t row1, size_t row2, const T val) {
+  private:
+    void add(size_t row1, size_t row2, const T val)
+        requires addable<decltype((*this)[0])> && 
+                 multipliable<decltype((*this)[0]), T>
+    {
         // debug << "------------------------\n";
         // debugil(val);
         // debugil((*this)[row2, 1]);
@@ -116,6 +280,7 @@ template <typename T> class Matrix : public Vector<Vector<T>> {
             _bind->div(row, val);
         }
     }
+  public:
 
     size_t rank();
 
@@ -193,7 +358,7 @@ template <typename T> class Matrix : public Vector<Vector<T>> {
         for (size_t i = mat._n; i > 1; i--) {
             mat.div(i, mat[i][i]);
             for (size_t j = i - 1; j >= 1; j--) {
-                if (mat[j][i] != 0) {
+                if (mat[j][i] != T(0)) {
                     mat.add(j, i, -mat[j][i]);
                     // debug << mat;
                 }
@@ -216,144 +381,10 @@ template <typename T> class Matrix : public Vector<Vector<T>> {
         return ans;
     }
 
-    size_t rsize() const {
-        return this->_n;
-    }
-    size_t csize() const {
-        return this->_m;
-    }
-
-    friend void swap(Matrix<T> &mat1, Matrix<T> &mat2) {
-        std::swap(mat1._n, mat2._n);
-        std::swap(mat1._m, mat2._m);
-        std::swap(mat1._data, mat2._data);
-    }
-
-    using Vector<Vector<T>>::operator==;
-    using Vector<Vector<T>>::operator!=;
-
-    using Vector<Vector<T>>::operator+=;
-    friend Matrix<T> operator+(const Matrix<T> &mat1, const Matrix<T> &mat2) {
-        Matrix<T> res(mat1);
-        res += mat2;
-        return res;
-    }
-    using Vector<Vector<T>>::operator-=;
-    friend Matrix<T> operator-(const Matrix<T> &mat1, const Matrix<T> &mat2) {
-        Matrix<T> res(mat1);
-        res -= mat2;
-        return res;
-    }
-    friend Matrix<T> operator*(const Matrix<T> &mat1, const Matrix<T> &mat2) {
-        assert(mat1._m == mat2._n);
-        Matrix<T> res(mat1._n, mat2._m);
-        for (size_t k = 1; k <= mat1._m; k++) {
-            for (size_t i = 1; i <= mat1._n; i++) {
-                for (size_t j = 1; j <= mat2._m; j++) {
-                    res[i][j] += mat1[i][k] * mat2[k][j];
-                }
-            }
-        }
-        return res;
-    }
-    friend Matrix<T> operator*(const Matrix<T> &mat, const colVector<T> &vec) {
-        return mat * Matrix<T>(vec);
-    }
-    friend Matrix<T> operator*(const rowVector<T> &vec, const Matrix<T> &mat) {
-        return Matrix<T>(vec) * mat;
-    }
-    Matrix<T>& operator*=(const Matrix<T> &mat) {
-        (*this) = (*this) * mat;
-        return (*this);
-    }
-    using Vector<Vector<T>>::operator*=;
-    Matrix<T> operator*(const T val) {
-        Matrix<T> res(*this);
-        res *= val;
-        return res;
-    }
-    friend Matrix<T> operator*(const T val, const Matrix<T> &mat) {
-        Matrix<T> res(mat);
-        res *= val;
-        return res;
-    }
-
-    friend std::ostream &operator<<(std::ostream &os, const Matrix<T> &mat) {
-        os << "\\begin{pmatrix}\n";
-        auto n = mat.rsize(), m = mat.csize();
-        for (size_t i = 1; i <= n; i++) {
-            for (size_t j = 1; j < m; j++) {
-                os << mat[i][j] << "&";
-            }
-            os << mat[i][m] << "\\\\\n";
-        }
-        os << "\\end{pmatrix}\n";
-        return os;
-    }
-
-    Matrix<T> operator^(int p) {
-        assert(rsize() == csize());
-        Matrix<T> base = (*this);
-        Matrix<T> ans = id(rsize());
-        if (p < 0) {
-            base = base.inverse();
-            p = -p;
-        }
-        while (p) {
-            if (p & 1) {
-                ans *= base;
-            }
-            base *= base;
-            p /= 2;
-        }
-        return ans;
-    }
-
     Matrix<T> operator/(const Matrix<T> &mat) {
         assert(mat.rsize() == mat.csize());
         return (*this) * mat.inverse();
     }
-
-    static Matrix<T> zero(int n) {
-        Matrix<T> mat(n, n);
-        for (int i = 1; i <= n; i++) {
-            mat[i][i] = T(0);
-        }
-        return mat;
-    }
-
-    static Matrix<T> id(int n) {
-        Matrix<T> mat(n, n);
-        for (int i = 1; i <= n; i++) {
-            mat[i][i] = T(1);
-        }
-        return mat;
-    }
-
-    static Matrix<T> diag(std::initializer_list<T> array) {
-        size_t n = array.size();
-        Matrix<T> mat(n, n, 0);
-        auto it = array.begin();
-        for (size_t i = 1; i <= n; i++, it++) {
-            mat[i][i] = *it;
-        }
-        return mat;
-    }
-
-    static Matrix<T> rand(int row, int col,
-                          std::initializer_list<int> range = {-10, 10}) {
-        Matrix<T> mat(row, col);
-        int minv = *(range.begin());
-        int maxv = *(std::next(range.begin()));
-        int div = 0;
-        do {
-            div = randint(minv, maxv);
-        } while (div == 0);
-        for (int i = 1; i <= row; i++) {
-            for (int j = 1; j <= col; j++) {
-                mat[i][j] = T(randint(minv, maxv)) / div;
-            }
-        }
-        return mat;
-    }
 };
+
+template<typename T>
